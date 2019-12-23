@@ -12,10 +12,10 @@
   .hamburger-inner,
   .hamburger-inner::before,
   .hamburger-inner::after {
-    background: $primary;
+    background: $black;
   }
   .hamburger-inner::after {
-    width: 18px;
+    // width: 18px;
     right: 0;
   }
   &.is-active {

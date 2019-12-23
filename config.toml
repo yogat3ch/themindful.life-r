@@ -1,27 +1,35 @@
 baseURL = "/"
 languageCode = "en-us"
 themesDir = "themes"
-title = "Hugo Hero Theme"
+title = "Stephen's Dev Portfolio"
 theme = "hugo-hero-theme"
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
 
 [params]
   google_analytics_id=""
+  author = "Stephen Holsenbeck"
+  highlightjsVersion = "9.12.0"
+  highlightjsCDN = "//cdnjs.cloudflare.com/ajax/libs"
+  highlightjsLang = ["r", "yaml"]
+  highlightjsTheme = "pygments"
+  
+  MathJaxCDN = "//cdnjs.cloudflare.com/ajax/libs"
+  MathJaxVersion = "2.7.5"
 
   [params.homepage_meta_tags]
-    meta_description = "Hero is a multipurpose Hugo theme with fullscreen hero images and page sections. It contains content types for a business or portfolio site."
-    meta_og_title = "Hugo Hero Theme"
+    meta_description = "This is a portfolio chronicling Stephen Holsenbeck's work with the R statistical programming language."
+    meta_og_title = "TheMindful.Life - R"
     meta_og_type = "website"
     meta_og_url = "https://hugo-hero.netlify.com"
     meta_og_image = "https://raw.githubusercontent.com/JugglerX/hugo-hero-theme/master/images/tn.png"
     meta_og_description = "Hero is a multipurpose Hugo theme with fullscreen hero images and page sections. It contains content types for a business or portfolio site."
     meta_twitter_card = "summary"
-    meta_twitter_site = "@zerostaticio"
+    meta_twitter_site = "@ascensionasana"
     meta_twitter_creator = "@zerostaticio"
 
 [[menu.main]]
-	name = "Services"
-	url = "/services/"
+	name = "R Experience"
+	url = "/r-experience/RLineCounter.html"
     weight = 1
 
 [[menu.main]]
