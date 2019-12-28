@@ -13,26 +13,25 @@
       > a {
         padding: 10px 14px 10px 14px;
         display: inline-block;
-        font-weight: regular;
+        font-weight: 600;
+        opacity: .75;
         text-transform: uppercase;
         text-decoration: none;
-        color: $primary;
+        color: $black;
+        font-family: $font-family-base;
         &:hover {
-          background: $primary;
-          color: #ffffff;
+          color: $link-hover-color;
           text-decoration: none;
         }
       }
-      &.active {
+      &:active {
         > a {
-          background: $primary;
           text-decoration: none;
-          color: #ffffff;
+          color: $white;
           &:hover {
             text-decoration: none;
-            background: $primary;
             transition: all 225ms ease-in 0s;
-            color: #ffffff;
+            color: $link-hover-color;
           }
         }
       }

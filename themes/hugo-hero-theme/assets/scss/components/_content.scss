@@ -46,4 +46,9 @@
       font-weight: $font-weight-thin;
     }
   }
+  iframe {
+    width: 1px;
+    min-width: 100%;
+    overflow-y: scroll
+  }
 }

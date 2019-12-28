@@ -50,7 +50,6 @@ $button-width: 35px;
 // }
 .main-menu-mobile {
   position: fixed;
-  background: $color-main;
   top: 0;
   left: 0;
   width: 100%;
@@ -68,6 +67,7 @@ $button-width: 35px;
     visibility: visible;
     height: 100%;
     z-index: 20;
+    background-color: $soft-white;
     li {
       animation: fadeInRight 0.5s ease forwards;
       animation-delay: 0.35s;
@@ -101,15 +101,23 @@ $button-width: 35px;
       position: relative;
       opacity: 0;
       a {
+        text-transform: uppercase;
         display: block;
         position: relative;
-        color: $color-link;
+        color: $black;
+        font-family: $font-family-base;
         text-decoration: none;
         overflow: hidden;
+        &:hover {
+          color:$link-hover-color;
+        }
         &:hover::after,
         &:focus::after,
         &:active::after {
           width: 100%;
+        }
+        &:active {
+          color: $white;
         }
         &::after {
           content: '';
@@ -119,7 +127,7 @@ $button-width: 35px;
           width: 0%;
           transform: translateX(-50%);
           height: 3px;
-          background: $color-link;
+          background: $white;
           transition: 0.35s;
         }
       }

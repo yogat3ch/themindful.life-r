@@ -20,32 +20,36 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
     meta_description = "This is a portfolio chronicling Stephen Holsenbeck's work with the R statistical programming language."
     meta_og_title = "TheMindful.Life - R"
     meta_og_type = "website"
-    meta_og_url = "https://hugo-hero.netlify.com"
-    meta_og_image = "https://raw.githubusercontent.com/JugglerX/hugo-hero-theme/master/images/tn.png"
-    meta_og_description = "Hero is a multipurpose Hugo theme with fullscreen hero images and page sections. It contains content types for a business or portfolio site."
+    meta_og_url = "http://themindful.life"
+    meta_og_image = "https://i0.wp.com/www.themindful.life/wp-content/uploads/2019/11/YogaPhoto.jpg?resize=245%2C300"
+    meta_og_description = "I choose the mindful life - Stephen Holsenbeck's personal website and portfolio."
     meta_twitter_card = "summary"
     meta_twitter_site = "@ascensionasana"
-    meta_twitter_creator = "@zerostaticio"
 
 [[menu.main]]
-	name = "R Experience"
-	url = "/r-experience/RLineCounter.html"
+	  name = "Back to main site"
+	  url = "http://themindful.life"
     weight = 1
+
+[[menu.main]]
+	  name = "R Experience"
+	  url = "/r-experience/"
+    weight = 2
 
 [[menu.main]]
     name = "Work"
     url = "/work/"
-    weight = 2
+    weight = 3
 
 [[menu.main]]
     name = "About"
     url = "/about/"
-    weight = 3
+    weight = 4
 
 [[menu.main]]
     name = "Contact"
     url = "/contact/"
-    weight = 4
+    weight = 5
 
 [permalinks]
   post = "/:year/:month/:day/:slug/"
