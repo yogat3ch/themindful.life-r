@@ -1,4 +1,5 @@
 baseURL = "/"
+publishDir = "godaddy"
 languageCode = "en-us"
 themesDir = "themes"
 title = "Stephen's Dev Portfolio"
@@ -6,6 +7,8 @@ theme = "hugo-hero-theme"
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
 
 [params]
+  backgroundDefault = "http://www.themindful.life/wp-content/uploads/2019/11/Banff.jpg"
+  customDateFormat = "2020-01-03"
   google_analytics_id=""
   author = "Stephen Holsenbeck"
   highlightjsVersion = "9.12.0"
@@ -37,19 +40,9 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
     weight = 2
 
 [[menu.main]]
-    name = "Work"
-    url = "/work/"
+    name = "Data Insights - blog"
+    url = "/posts/"
     weight = 3
-
-[[menu.main]]
-    name = "About"
-    url = "/about/"
-    weight = 4
-
-[[menu.main]]
-    name = "Contact"
-    url = "/contact/"
-    weight = 5
 
 [permalinks]
   post = "/:year/:month/:day/:slug/"

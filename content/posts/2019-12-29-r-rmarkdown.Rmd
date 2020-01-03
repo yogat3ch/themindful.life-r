@@ -1,0 +1,21 @@
+---
+title: "First Post"
+author: "Stephen Holsenbeck"
+date: 2019-12-29T10:46:14-04:00
+categories: ["R"]
+tags: ["R Markdown", "Rpubs"]
+slug: "first"
+css: C:\Users\Administrator\Documents\R\win-library\3.5\neuhwk\rmarkdown\templates\DA5030\resources\bootstrap.min.css
+theme: yeti
+df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+# RPubs
+All R Markdown documents prior to the date of this blog post are published on my `r shiny::a(href = "http://rpubs.com/yogat3ch", target = "_blank", "Rpubs")`. 
+
+# Future works
+As I continue to explore data with R and derive insights I'll be posting new content on this blog. Stay tuned!

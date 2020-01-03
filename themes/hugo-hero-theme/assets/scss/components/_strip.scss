@@ -53,3 +53,9 @@
 .strip-bg-cover {
   background-size: cover;
 }
+// Add background to any text block with text-bg
+.strip div.text-bg {
+  background: $menu-bg;
+  border-radius: 10px;
+  padding: 10px;
+}
