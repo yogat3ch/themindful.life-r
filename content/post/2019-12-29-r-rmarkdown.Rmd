@@ -8,6 +8,8 @@ slug: "first"
 css: C:\Users\Administrator\Documents\R\win-library\3.5\neuhwk\rmarkdown\templates\DA5030\resources\bootstrap.min.css
 theme: yeti
 df_print: paged
+heroHeading: The Beginning
+heroSubHeading: An informative first post
 ---
 
 ```{r setup, include=FALSE}

@@ -8,6 +8,14 @@
 # RStudio files
 .Rproj.user/
 *.Rproj
+.*_cache/
+godaddy/
+static/
+
+
+# R Coursework Folder (Separate Git)
+R Experiential Coursework/
+
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
@@ -24,3 +32,5 @@ blogdown
 *.png
 *.jpg
 *.svg
+.ssh/
+

@@ -6,16 +6,23 @@ title = "Stephen's Dev Portfolio"
 theme = "hugo-hero-theme"
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
 
+[author]
+  name = "Stephen"
+
 [params]
   backgroundDefault = "http://www.themindful.life/wp-content/uploads/2019/11/Banff.jpg"
-  customDateFormat = "2020-01-03"
+  customDateFormat = "Sun, Jan 2, 2006"
   google_analytics_id=""
   author = "Stephen Holsenbeck"
   highlightjsVersion = "9.12.0"
   highlightjsCDN = "//cdnjs.cloudflare.com/ajax/libs"
   highlightjsLang = ["r", "yaml"]
   highlightjsTheme = "pygments"
-  
+  themeColor1text = "black-text"
+  themeColor1 = "blue darken-4"
+  themeColor2text = "deep-orange-text accent-4"
+  showPostSummary = true
+
   MathJaxCDN = "//cdnjs.cloudflare.com/ajax/libs"
   MathJaxVersion = "2.7.5"
 
@@ -30,19 +37,24 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
     meta_twitter_site = "@ascensionasana"
 
 [[menu.main]]
-	  name = "Back to main site"
+	  name = "Back to main WP site"
 	  url = "http://themindful.life"
     weight = 1
 
 [[menu.main]]
-	  name = "R Experience"
-	  url = "/r-experience/"
+	  name = "Portfolio Home"
+	  url = "/"
     weight = 2
 
 [[menu.main]]
-    name = "Data Insights - blog"
-    url = "/posts/"
+	  name = "R Experience"
+	  url = "/r-experience/"
     weight = 3
+
+[[menu.main]]
+    name = "Data Insights - blog"
+    url = "/post/"
+    weight = 4
 
 [permalinks]
   post = "/:year/:month/:day/:slug/"
