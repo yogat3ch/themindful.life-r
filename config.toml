@@ -1,4 +1,4 @@
-baseURL = "/"
+baseURL = "http://themindful.life/r/"
 publishDir = "godaddy"
 languageCode = "en-us"
 themesDir = "themes"

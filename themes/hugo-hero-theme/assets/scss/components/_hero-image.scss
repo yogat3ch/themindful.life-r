@@ -25,6 +25,7 @@
     margin: auto 0;
     padding: 20px;
     border-radius: 5px;
+    background-color: rgba(0,0,0,.5);
     h1 {
       // font-size: 3rem;
       font-size: 57px;
@@ -64,6 +65,7 @@
   .hero-section {
     text-transform: uppercase;
     font-weight: normal;
+    display: none; // Remove section above header
   }
 }
 .hero-image-fullscreen {
