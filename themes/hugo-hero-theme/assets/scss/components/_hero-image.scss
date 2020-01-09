@@ -22,16 +22,21 @@
   .hero-text {
     flex: 0;
     color: #ffffff;
-    margin: auto 0;
+    margin: auto;
     padding: 20px;
     border-radius: 5px;
     background-color: rgba(0,0,0,.5);
+    width: fit-content;
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    position: relative;
     h1 {
       // font-size: 3rem;
       font-size: 57px;
       font-weight: 600;
       letter-spacing: -1px;
       text-shadow: $intro-text-shadow;
+      margin: 0px;
       @include media-breakpoint-up(md) {
         font-size: 4rem;
         // width: 80%;
@@ -53,6 +58,16 @@
         // width: 60%;
       }
     }
+    &:after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      width: 75px;
+      height: 4px;
+      background-color: #ffce55;
+      left: 50%;
+      margin-left: -37.5px;
+      }
   }
   .hero-down {
     flex: 0;

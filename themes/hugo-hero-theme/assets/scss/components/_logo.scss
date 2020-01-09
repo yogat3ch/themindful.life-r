@@ -18,6 +18,7 @@
     font-size: 22px;
     font-weight: normal;
     text-transform: uppercase;
+    white-space: nowrap;
     &:hover {
       color: $link-hover-color;
     }
