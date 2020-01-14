@@ -9,9 +9,12 @@
   @include media-breakpoint-down(md) {
     max-height: 72px;
   } 
+  @include media-breakpoint-up(md) {
+    max-height: 73px;
+  } 
   .container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
   }
   &.header-absolute {

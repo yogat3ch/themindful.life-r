@@ -19,17 +19,23 @@
 
 .main-menu {
   display: none;
-  @include media-breakpoint-up(md) {
+  @include media-breakpoint-up(lg) {
     display: none;
   }
-  > ul {
+  &.rollOut {
+    display: inline-block;
+    transition: all .25s ease-in-out 0;
+  }
+  & > ul {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    > li {
+    list-style-type: none;
+    & > li {
       list-style: none;
       font-size: 0.9rem;
-      > a {
+      position: relative;
+      & > a {
         padding: 10px 14px 10px 14px;
         display: inline-block;
         font-weight: 600;
@@ -41,6 +47,21 @@
         &:hover {
           color: $link-hover-color;
           text-decoration: none;
+        }
+      }
+      & ul.sub-menu {
+          @include generate-drop-down
+      }
+      @include media-breakpoint-up(lg) {
+        ul.sub-menu {
+          display:none;
+        }
+      }
+      &:hover {
+        @include media-breakpoint-up(lg) {
+          ul.sub-menu {
+            display:block;
+          }
         }
       }
       &:active {

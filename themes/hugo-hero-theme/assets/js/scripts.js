@@ -8,15 +8,14 @@ menuTrigger.onclick = function() {
     menuTrigger.classList.toggle('is-active')
     body.classList.toggle('lock-scroll')
 }
-if (screen.width > 720) {
+if (screen.width > 992) {
     menuTrigger.addEventListener("mouseover", mouseOver)
     header.addEventListener("mouseleave", mouseLeave)
 
     function mouseOver() {
-        document.getElementById("main-menu").style.display = "block";
-        document.getElementById("main-menu").style.transition = "all .25s ease-in-out 0;"
+        $(".main-menu").addClass("rollOut");
     }
     function mouseLeave() {
-        document.getElementById("main-menu").style.display = "none";
+        $(".main-menu").removeClass("rollOut")
     }   
 }

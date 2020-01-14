@@ -37,23 +37,35 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
     meta_twitter_site = "@ascensionasana"
 
 [[menu.main]]
-	  name = "Back to main WP site"
+	  name = "Home"
 	  url = "http://themindful.life"
     weight = 1
 
 [[menu.main]]
-	  name = "Portfolio Home"
-	  url = "/"
+	  name = "About"
+	  url = "http://themindful.life/about"
     weight = 2
 
 [[menu.main]]
-	  name = "R Experience"
-	  url = "/r-experience/"
+	  name = "Portfolio"
+	  url = "/"
     weight = 3
 
 [[menu.main]]
-    name = "Data Insights - blog"
+    name = "R (Data Science)" # Drop-down menu entry
     url = "/post/"
+    weight = 1
+    parent = "Portfolio" # Entry in main menu
+
+[[menu.main]]
+    name = "Web Design"
+    url = "http://themindful.life/portfolio/"
+    weight = 2
+    parent = "Portfolio"
+
+[[menu.main]]
+	  name = "Contact"
+	  url = "http://themindful.life/contact"
     weight = 4
 
 [permalinks]
