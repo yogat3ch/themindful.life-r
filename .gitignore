@@ -28,7 +28,6 @@ public
 blogdown
 
 # All Generated
-*.html
 *.png
 *.jpg
 *.svg

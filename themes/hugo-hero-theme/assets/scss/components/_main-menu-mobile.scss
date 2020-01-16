@@ -1,53 +1,4 @@
-$color-main: $primary;
-$color-active: #ffffff;
-$color-link: #ffffff;
 
-$button-height: 27px;
-$button-width: 35px;
-// .button_container {
-//   position: fixed;
-//   top: 5%;
-//   right: 2%;
-//   height: $button-height;
-//   width: $button-width;
-//   cursor: pointer;
-//   z-index: 1000;
-//   transition: opacity 0.25s ease;
-//   &:hover {
-//     opacity: 0.7;
-//   }
-//   &.active {
-//     .top {
-//       transform: translateY(11px) translateX(0) rotate(45deg);
-//       background: $color-active;
-//     }
-//     .middle {
-//       opacity: 0;
-//       background: $color-active;
-//     }
-//     .bottom {
-//       transform: translateY(-11px) translateX(0) rotate(-45deg);
-//       background: $color-active;
-//     }
-//   }
-//   span {
-//     background: $color-main;
-//     border: none;
-//     height: 5px;
-//     width: 100%;
-//     position: absolute;
-//     top: 0;
-//     left: 0;
-//     transition: all 0.35s ease;
-//     cursor: pointer;
-//     &:nth-of-type(2) {
-//       top: 11px;
-//     }
-//     &:nth-of-type(3) {
-//       top: 22px;
-//     }
-//   }
-// }
 .main-menu-mobile {
   position: fixed;
   top: 0;
@@ -59,9 +10,12 @@ $button-width: 35px;
   transition: opacity 0.35s, visibility 0.35s, height 0.35s;
   overflow: hidden;
   display: flex;
-  justify-content: center;
   align-items: center;
   flex-direction: column;
+  padding-top: 80px;
+  & .sub-menu {
+    font-size:.75em;
+  }
   &.open {
     opacity: 0.9;
     visibility: visible;
@@ -88,7 +42,9 @@ $button-width: 35px;
       }
     }
   }
-  ul {
+  & ul {
+    width: 100%;
+    background: $menu-bg;
     font-size: 2rem;
     font-family: $font-family-heading;
     text-align: center;
@@ -105,6 +61,7 @@ $button-width: 35px;
         display: block;
         position: relative;
         color: $black;
+        opacity: .75;
         font-family: $font-family-base;
         text-decoration: none;
         overflow: hidden;

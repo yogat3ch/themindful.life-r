@@ -9,6 +9,9 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
 [author]
   name = "Stephen"
 
+[markup]
+  defaultMarkdownHandler = "blackfriday"
+
 [params]
   backgroundDefault = "http://www.themindful.life/wp-content/uploads/2019/11/Banff.jpg"
   customDateFormat = "Sun, Jan 2, 2006"
