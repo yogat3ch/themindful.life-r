@@ -1,6 +1,6 @@
 ---
 title: 'Data Science Experience'
-weight: 1
+weight: 2
 background: 'images/R.jpg'
 button: 'View Experience'
 buttonLink: 'r-experience'

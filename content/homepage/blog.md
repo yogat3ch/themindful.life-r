@@ -1,6 +1,6 @@
 ---
 title: 'The Data Insights Blog'
-weight: 2
+weight: 1
 background: ''
 button: 'Read'
 buttonLink: 'post'
