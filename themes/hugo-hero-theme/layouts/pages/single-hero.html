@@ -1,0 +1,16 @@
+{{ define "header_css" }}{{ end }}
+{{ define "body_classes" }}page-pages-single{{ end }}
+{{ define "header_classes" }}{{ end }}
+
+{{ define "main" }}
+{{ partial "hero-image-setheight.html" (dict "background" .Params.heroBackground "heading" .Params.heroHeading "subheading" .Params.heroSubHeading "section" .Section "content" . "ctx" $)}}
+<iframe src="RLineCounter.html" frameborder="0" width="100%" height="1200px" id="dashboard"></iframe>
+<script src="https://cdn.jsdelivr.net/npm/iframe-resizer@4.2.8/js/iframeResizer.min.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/perfops-rom"></script>
+<script type="text/javascript">
+const iframes = iFrameResize(
+    {log: true},
+    '#dashboard');
+</script>
+{{ .Content }}
+{{ end }}

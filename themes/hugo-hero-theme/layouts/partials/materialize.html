@@ -1,0 +1,5 @@
+{{ $cssbootstrap := resources.Get (printf "/css/materialize-%s.min.css" "default") }}
+{{ $cssfontawesome := resources.Get "/css/fontawesome-free-5.10.1-web-all.min.css" }}
+{{ $allcss := slice $cssbootstrap $cssfontawesome | resources.Concat "/css/vendor.css" | minify | fingerprint "sha512" }}
+<link rel="stylesheet" href="{{ $allcss.RelPermalink }}" integrity="{{ $allcss.Data.Integrity }}">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">

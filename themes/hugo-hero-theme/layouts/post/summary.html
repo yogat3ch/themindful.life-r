@@ -1,0 +1,13 @@
+<div class="post posts-summary">
+  {{ if .Params.featured_image }}
+  <div class="post-image">
+    <img src={{ .Params.featured_image }} alt={{ path.Base .Page.Params.featured_image }} class="featured_image">
+  </div>
+  {{ end }}
+  <div class="posts-content">
+    <h2 class="posts-title">
+      <a href="{{ .Permalink }}">{{ .Title }}</a>
+    </h2>
+    {{ .Content | truncate 120 "..." }}
+  </div>
+</div>

@@ -1,0 +1,16 @@
+{{ $scratch := newScratch }}
+{{ if gt (strings.RuneCount .background) 5}} 
+{{ $scratch.Set "bg" .background }}
+{{ else }}
+{{ $scratch.Set "bg" .content.Site.Params.backgroundDefault }}
+{{ end }}
+<div id="hero" class="hero-image hero-image-setheight text-center" style="background-image: url('{{ ($scratch.Get "bg") }}')">
+  <div class="container ">
+    <div class="hero-text">
+      <span class="hero-section">{{ .section }}</span>
+      <h1>{{ .heading }}</h1>
+      <p>{{ .subheading }}</p>
+    </div>
+  </div>
+</div>
+<div>

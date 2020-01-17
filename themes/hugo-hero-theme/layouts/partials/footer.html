@@ -1,0 +1,32 @@
+<div class="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="footer-inner float-md-left float-lg-left float-xl-left">
+          <ul>
+            <li class="zerostatic">Hugo-Hero Theme by <a href="https://www.zerostatic.io">www.zerostatic.io</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+           <!-- Icons -->
+           {{ if .Site.Menus.icon }}
+           <div class="text-center site-icons">
+               {{ range sort .Site.Menus.icon }}
+               <div class="list-inline-item">
+               <a href="{{ .URL }}"><i class="{{ .Name }} fa-2x" style="font-size:32px;"></i></a>
+               </div>
+               {{ end }}
+           </div>
+           {{ end }}
+      </div>
+      <div class="col-md-4">
+        <div class="footer-inner float-md-right float-lg-right float-xl-right">
+          <ul class="footer-menu">
+            <li class="copyright">© {{ now.Format "2006" }} {{.Site.Title}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -39,6 +39,26 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
     meta_twitter_card = "summary"
     meta_twitter_site = "@ascensionasana"
 
+[[menu.icon]]
+    url = "https://github.com/yogat3ch/"
+    name = "fab fa-github"
+    weight = 1
+
+[[menu.icon]]
+    url = "https://twitter.com/ascensionasana"
+    name = "fab fa-twitter"
+    weight = 4
+
+[[menu.icon]]
+    url = "https://www.linkedin.com/holsenbeck/"
+    name = "fab fa-linkedin-in"
+    weight = 2
+
+[[menu.icon]]
+    url = "https://rpubs.com/yogat3ch/"
+    name = "fas fa-registered"
+    weight = 3
+
 [[menu.main]]
 	  name = "Home"
 	  url = "http://themindful.life"

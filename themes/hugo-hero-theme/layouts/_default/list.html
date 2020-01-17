@@ -1,0 +1,78 @@
+{{ define "header_css" }}
+{{ partial "materialize.html" . }}
+{{ end }} 
+{{ define "body_classes" }}{{ end }}
+{{ define "header_classes" }}{{ end }}
+
+{{- define "main" -}}
+{{ partial "hero-image-setheight.html" (dict "background" .Params.heroBackground "heading" .Title "subheading" .Params.heroSubHeading "section" .Section "content" .)}}
+{{ $customDateFormat := "02.01.2006" }}
+{{ with .Site.Params.customDateFormat }}{{ $customDateFormat = . }}{{ end }}
+{{ $sitetitle := (.Title) }}
+
+<div class="container">
+    {{ if .Site.Params.showListsGrouped }}
+        <div class="row">
+            <div class="col s12 m12">
+                <div class="card">
+                    <div class="card-content">
+                        <h1 class="card-title">{{ $sitetitle }}</h1>
+                        {{ range $key, $value := .Pages.GroupByDate "2006" }}
+                            <a href="#{{ $key | urlize }}"><span>{{ .Key }}</span> <span class="grey-text">({{ len .Pages }})</span></a>&nbsp;&nbsp;
+                        {{ end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ range .Pages.GroupByDate "2006" }}
+            <div class="row">
+                <div class="col s12 m12">
+                    <div class="card">
+                        <div class="card-content">  
+                            <h2 class="card-title" id="{{ .Key | urlize }}">{{ .Key }}</h2>
+                            <ul>
+                                {{ range .Pages }}
+                                    <li>{{ .PublishDate.Format $customDateFormat }} - <a href="{{ .RelPermalink }}" title="{{ .Title }}">{{ .Title }}</a></li>
+                                {{ end}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{ end }}
+    {{ else }}
+        <div class="row">
+            <div class="col s12 m12">  
+                <div class="card">
+                    <div class="card-content">  
+                        <h1 class="card-title">{{ .Title }}</h1>
+                        <ul>
+                            {{ range .Pages.ByPublishDate.Reverse }}
+                            {{ .Page.Scratch.Set "Params" (dict "Title" .Title "PublishDate" .PublishDate "customDateFormat" $customDateFormat "RelPermalink" .RelPermalink) }}
+                              {{ if or (eq $.Title "Tags") (eq $.Title "Categories") }}  
+                                <li style="display:inline-block">
+                                  {{ $Params := .Page.Scratch.Get "Params" }}
+                                  {{ if gt $Params.PublishDate 0}}
+                                  {{ $Params.PublishDate.Format $Params.customDateFormat }} -
+                                  {{ end }}
+                                  <a class="button" href="{{ $Params.RelPermalink }}" title="{{ $Params.Title }}">{{ $Params.Title }}</a>
+                                </li>  
+                              {{ else }}
+                                  <li>
+                                    {{ $Params := .Page.Scratch.Get "Params" }}
+                                    <h6>
+                                    {{ $Params.PublishDate.Format $Params.customDateFormat }} - 
+                                    <a href="{{ $Params.RelPermalink }}" title="{{ $Params.Title }}">{{ $Params.Title }}</a></h6>
+                                  </li>
+                              {{ end }}
+                                
+                            {{ end}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{ end }}
+</div>
+
+{{- end -}}
