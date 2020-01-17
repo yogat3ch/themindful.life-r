@@ -24,8 +24,7 @@ vignettes/*.pdf
 .httr-oauth
 .RData
 .Ruserdata
-public
-blogdown
+public/
 
 # All Generated
 *.png

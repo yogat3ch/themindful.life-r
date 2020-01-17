@@ -33,7 +33,7 @@ slug: "meta-narrative"
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>With a sense of realism towards what could be quite rusty mathematical skill, I proceeded cautiously into a graduate certificate in data analytics program at Northeastern. Faring well with learning statistics and the R statistical programming language during the program's two semester, I decided to further what I found to be a fruitful new aptitude and pursue a Master's in health data analytics. The Master's program served to push my intellectual capacity to it's limits (and sometimes beyond). Many courses, challenges, and portfolio projects later, I managed to complete the program and earn the Master of Science degree.</p>
+<p>With a sense of realism towards what could be quite rusty mathematical skill, I proceeded cautiously into a graduate certificate in data analytics program at Northeastern. Faring well with learning statistics and the R statistical programming language during the program's two semesters, I decided to further what I found to be a fruitful new aptitude and pursue a Master's in health data analytics. The Master's program served to push my intellectual capacity to it's limits (and sometimes beyond). Many courses, challenges, and portfolio projects later, I managed to complete the program and earn the Master of Science degree.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->

@@ -1,7 +1,7 @@
 .footer {
   background: $secondary;
   padding-top: 20px;
-  padding-bottom: 20px;
+  // padding-bottom: 20px;
   .footer-inner {
     display: flex;
     justify-content: space-between;
@@ -67,7 +67,7 @@
         a {
           display: inline-block;
           height: 40px;
-          padding: 10px 8px 10px 8px;
+          // padding: 10px 8px 10px 8px;
           font-weight: 300;
         }
       }
