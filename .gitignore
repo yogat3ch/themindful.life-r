@@ -34,4 +34,3 @@ public/
 /resources/**
 *.css
 *.map
-/themes/hugo-hero-theme/.gitignore
