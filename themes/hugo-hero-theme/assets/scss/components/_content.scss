@@ -12,8 +12,9 @@
     text-decoration: underline;
   }
   p {
-    color: rgb(78, 78, 78);
+    color: $font-color;
     font-family: $font-family-base;
+    font-weight: $font-weight-normal;
   }
   h1 {
     font-family: $font-family-heading;
