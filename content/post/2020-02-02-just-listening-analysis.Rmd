@@ -1,0 +1,582 @@
+---
+title: "Just Listening - Analysis"
+author: "John Morrison & Stephen Holsenbeck"
+date: '`r format(Sys.time(), "%Y-%m-%d")`'
+slug: just-listening-analysis
+categories: ["R", "Analysis"]
+tags: ["Music", "Musical Composition", "Composition", "Chi squared"]
+draft: yes
+always_allow_html: yes
+header-includes:
+   - \usepackage{dcolumn}
+output: 
+  html_document: 
+    self_contained: yes
+    highlight: zenburn
+    keep_md: no
+    theme: spacelab
+    toc: TRUE
+    df_print: paged
+    code_folding: hide
+---
+```{r setup, include=FALSE}
+# Knitr Options
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE, fig.align = 'center', fig.height = 5, fig.width = 7.5, tidy = TRUE, tidy.opts = list(width.cutoff = 80))
+options(scipen = 12)
+# Make reproducible
+set.seed(1)
+# Load packages
+HDA::startPkgs(c("tidyverse","magrittr","printr", "htmltools"))
+# # Attach dependencies
+# rmarkdown::html_dependency_jquery()
+# rmarkdown::html_dependency_bootstrap("spacelab")
+# rmarkdown::html_dependency_jqueryui()
+# # Use Chunk Titles to add Bold Headings to Chunks
+# source("~/R/Scripts/addChunkTitles.R")
+# rmd <- addChunkTitles(rstudioapi::getSourceEditorContext()$path)
+# write(rmd,file=(rstudioapi::getSourceEditorContext()$path))
+# # HTML to Latex
+# source("~/R/Scripts/HTMLtoLatex.R")
+# rmd <- HTMLtoLatex(rstudioapi::getSourceEditorContext()$path)
+# write(rmd,file=(rstudioapi::getSourceEditorContext()$path))
+```
+
+# Just Listening
+## Study Description
+*Note:* terminology used throughout this article have their first instance italicized. Each unitalicized reference to this term will imply this specific term and it's definition for this study.
+The study involved the creation of 35 musical *examples* performed by John Morrison, each of which demonstrates three variations in four musical *parameters*:
+
+```{r 'Opts and Print Params'}
+opts <- list(params = list(register = c("low", "mid", "high"), dynamic = c("ppp", "mp", "ff"), tempo = c("Molto Largo", "Moderato", "Prestissimo"), articulation = c("legato", "neutral", "staccato")) -> params,
+             variations = expand.grid(purrr::map(params, ~{factor(.x, levels = .x)})),
+            tone = c("0 Other", "1 Forceful: aggressive, piercing, angry, shocking", "2 Assertive: bold, stern, decisive, declamatory", "3 Energetic: brave, frantic, lively, angular", "4 Light: airy, dreamy, bright, delicate", "5 Gentle: sweet, pleasant, shy, calm", "6 Playful: cheerful, dancing, joking, jaunty", "7 Melancholy: sad, nostalgic, dark, longing", "8 Moving: majestic, heroic, awe-inspiring")  %>% str_remove("\\d\\s" )%>% as_data_frame() %>% separate(value, into = c("tone", "desc"), sep = "\\:\\s") %>% replace_na(list(desc = "other")) %>% mutate_at(vars(tone), ~{factor(., levels = .)})
+)
+opts$params %>% 
+  {
+    tagList(
+      tags$ul(class = "nested",
+        tagList(purrr::imap(., ~{ 
+          tags$li(.y,
+               tags$ul(
+                 tagList(purrr::map(.x, ~{ tags$li(.x) }))
+               )                        
+             ) 
+          })
+        )
+      )
+    )
+  }
+```
+
+If each combination of the three levels of each of the four parameters were considered, that would result in $3^4 = 81$ combinations. Of course, this would be quite laborious to perform for any musician, so 35 are considered. These 35 are listed in the table below:
+
+```{r 'Auth Acct', echo = F}
+googlesheets4::sheets_auth(email = "imadata2019@gmail.com")
+.dat <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1fsyZ1NVZ2WtYdCFTxQed5WE4KzvTvSC2b7-joD6rieE/edit", range = "'resultant data (no demographics)'!A1:DB49")
+```
+```{r 'Display Examples'}
+.dat %>%
+  # Select the IMA cols
+  select(- starts_with(".")) %>% 
+  # get the first 4 rows
+  extract(1:4,) %>% 
+  # unnest the data 
+  unnest() %>% 
+  # make first row into rownames
+  {column_to_rownames(., var = names(.)[1])} %>% 
+  # transpose
+  t %>% 
+  # rename rownames
+  set_rownames(1:nrow(.)) %>% 
+  # Save examples 
+  assign("examples", ., envir = .GlobalEnv) %>% 
+  # show
+  DT::datatable()
+```
+
+Subjects voluntarily took a survey in which they were randomized to *encounter* five examples each. Some subjects experienced the examples at random where multiple parameters could change dramatically from encounter to encounter. Others experienced (a random set of examples) that were selected in sequential order from the examples, where parameters changed incrementally from one encounter to the next.
+
+For each encounter a subject was prompted to rate their subjective assessment of the *tone* of the example, and the strength to which they attributed the tone to the example.
+The tones and their descriptions are listed below:
+```{r 'Show Tones'}
+opts$tone
+```
+
+## Data Acquisition and Cleaning
+The raw data was collected via Google Spreadsheet. Each row corresponds to an observation, except where responses were separate by randomization group. Here we use `googlesheets4` to read the data from the google sheet. The column names are non-standard, so standardized column names are applied. Rows where randomization group are labelled are removed and the sheet is split into a list containing the corresponding observations. 
+```{r 'Raw Form Reponses'}
+.dat_raw <-
+  googlesheets4::read_sheet(
+    "https://docs.google.com/spreadsheets/d/1k174OGNWjmUXtzzo0-v99ABH80V2cw2KDek630FsCL8/edit#gid=2004007850",
+    range = "'Form Responses 1'!A:Z",
+    col_names = F
+  )
+.sections <-
+  purrr::map_lgl(.dat_raw[[1]], is.null) %>% {
+    HDA::rleIndex(rle(.))
+  }
+.sections_ind <-
+  apply(.sections, 1, .dat_raw = .dat_raw, function(.r, .dat_raw) {
+    if (.r['values'] == F) {
+      .out <- (.r['start'] + 1):.r['end']
+    } else
+      NULL
+  }) %>% purrr::compact()
+.dat_sections <-
+  apply(.sections, 1, .dat_raw = .dat_raw, function(.r, .dat_raw) {
+    if (.r['values'] == F) {
+      .out <- .dat_raw[(.r['start'] + 1):.r['end'],]
+      .out
+    } else
+      NULL
+    
+  }) %>% purrr::compact()
+```
+
+There is one observation that can be assumed invalid by the bogus answers provided (Location was indicated as 42). This invalid entry is removed.
+```{r 'Raw Form Reponses Cleaning'}
+# Remove invalid entry
+.dat_sections[[7]] <-
+  .dat_sections[[7]][-6, ]
+# Rename according to the trial
+names(.dat_sections) <-
+  as.character(20:1)
+```
+
+The proportion of each tone selected in each encounter, by each randomization group is summarised here.
+```{r 'Summarize the Proportions'}
+response_proportions <- purrr::map(.dat_sections, ~{
+  .reg <-
+    opts$tone$tone %>%
+    as.character() %>%
+    paste0(collapse = "|") %>%
+    regex()
+  .out <-
+    purrr::map(.x[, c(12, 15, 18, 21, 24)], .v = c(12, 15, 18, 21, 24), function(.x, .v) {
+      # .strength_table <- .x[, c(.v, .v + 2)]
+      # as.character(opts$tone)
+      .all_tokens <- str_match_all(.x, .reg)
+      .total_freq <- unlist(.all_tokens) %>% table() %>% prop.table()
+      .out <- opts$tone %>% select(-`desc`)
+      .out$freq <-
+        opts$tone$tone %>%
+        purrr::map_dbl(.freq = .total_freq, function(.x, .freq) {
+          ifelse(is.na(.freq[as.character(.x)]), 0, .freq[as.character(.x)])
+        })
+      return(.out)
+    })
+})
+```
+
+The example and corresponding parameters for each encounter are listed in an accessible tabular format to the right of the form responses. These are matched to the encounter. Columns are renamed with legible and interpretable names.
+```{r 'Parse the parameter associations for each case'}
+.dat_params <-
+  googlesheets4::read_sheet(
+    "https://docs.google.com/spreadsheets/d/1uZiG2f2sZ1IeyNcGQUV9Nw-K_LDpAOMwAdtI5_ZED08/edit#gid=164770121",
+    range = "'Form Responses (dealing with mulitples)'!AV1:EV474",
+    col_names = F
+  )
+.col_names <-
+  googlesheets4::read_sheet(
+    "https://docs.google.com/spreadsheets/d/1uZiG2f2sZ1IeyNcGQUV9Nw-K_LDpAOMwAdtI5_ZED08/edit#gid=164770121",
+    range = "'Form Responses (dealing with mulitples)'!AV1:EV1",
+    col_names = T
+  )
+names(.dat_params) <- names(.col_names)
+.dat_params <- .dat_params %>% mutate_all(~{
+  purrr::map(., ~{ifelse(is.null(unlist(.x)), NA, as.double(unlist(.x)))})
+})  # remove the list column and retain numbers
+.test <-
+  apply(.dat_params, 1, .n = names(.dat_params), function(.r, .n) {
+    # which(!is.na(is.numeric(.r)))
+    .str <- {
+      names(.r)[which(purrr::map_lgl(.r, ~{
+        !is.na(.x) | !nchar(.x) < 1
+      }))] %>% str_subset("strength")
+    }
+    .n[which(.n %in% .str) - 1]
+  })
+.param_vals <-
+  purrr::map(.sections_ind, ~{
+    .out <- .test[.x] %>% purrr::map(~{
+      str_extract(.x, "\\d+")
+    }) %>% 
+      do.call(rbind.data.frame, .) %>%
+       {
+       set_names(., value = 1:ncol(.))
+     } %>%
+      set_rownames(value = .x)
+    
+  })
+# Remove a row corresponding to the invalid entry
+.param_vals[[7]] <-
+  .param_vals[[7]][-6, ]
+dat_flat <- purrr::map2(.dat_sections, .param_vals, cbind.data.frame) %>% bind_rows(.id = "sets") %>% set_names(value = 
+c("timestamp", "name_email.dem", "age.dem", "gender.dem", "ctry.dem", "ed.dem", "music_train.dem", "music_desc.dem", "place.dem", "loc.dem", "referral.dem", paste0(rep(1:5, each = 3),".", c("encounter", "other", "strength")), 1:5, "sets"))
+```
+
+
+
+### Purpose and hypotheses of this analysis
+With this analysis we intend to discover if:
+$H_a$. A shift in a specific parameter causes a shift in the assessment of tone, and if so what magnitude of shift in a parameter (ie low - mid or low - high etc) results in a change in the assessment of tone.
+$H_{a0}$ The general null hypothesis is to assume that shifts in all levels of all parameters will have no effect on tone.
+
+$H_b$. If there are associations between a specific parameter and a specific tone, and if so what degree of association there is.
+$H_{b0}$ The null hypothesis is to assume that there is no association between a specific parameter and a specific tone.
+
+## Analysis
+To begin analyzing such a strata of categorical data and progress in a systematic way, we will format the data in a 2-D table such that each example, it's parameters, and the examples to which it will be compared can be easily viewed left to right. This table can serve as a map for the statistical analyses to be performed later. The comparisons requested are provided as text in an email. We're going to start with a comparison of the example that is neutral in all parameters (example 1), to each example that varies from all neutral by a change in only a single parameter. However, there will be one exception, as there are not examples that deviate from neutral in the register parameter. 
+The progression of comparisons across parameters can be viewed on the diagonal in the table below. All but the first two will be compared to all neutral example 1.
+
+```{r 'Create Test Parameter Set'}
+test_parameters <- purrr::imap(names(opts$params) %>% setNames(nm = .), .var = opts$variations, .neutral = rep(2,4) %>% setNames(names(opts$params)), function(.x, .y, .var, .neutral){
+  # looking at the high variant of the parameter first
+  .neutral[.y] <- 3
+  # print(.neutral)
+  # print(.y)
+  .sym <- as.symbol(.y)
+  # print(.y)
+  # Transform the parameter names that aren't the one mapped into a regex
+  .syms <- names(.var)[!names(.var) %in% .y] %>%
+    paste(collapse = "|")
+  #print(.syms)
+  # Parameters are factors, hence the as.numeric
+  .hi <- .var %>%
+    # Filter for all the examples where the mapped parameter is high
+    filter(.neutral[.y] == as.numeric(!!.sym)) %>%
+    # Filter for the examples where all other parameters are neutral 
+    filter_at(vars(matches(.syms)), all_vars(as.numeric(.) == 2))
+  # looking at the low variant next
+  .neutral[.y] <- 1
+  # Same as above
+  .lo <- .var %>%
+    filter(.neutral[.y] == as.numeric(!!.sym)) %>%
+    filter_at(vars(matches(.syms)), all_vars(as.numeric(.) == 2))
+  
+  return(rbind.data.frame(.hi,.lo))
+}) %>% do.call(rbind.data.frame, .)
+#Combine with examples:  Sat Jan 25 19:39:19 2020 ----
+.examples <-
+  googlesheets4::read_sheet(
+    "https://docs.google.com/spreadsheets/d/1nxcCqywl_VKdpiWU_CeyRmT7rZUWRBIDKXsJ2I0DzAg/edit#gid=0",
+    range = "'examples in order'!A3:E38"
+  )
+
+(test_parameters <- left_join(test_parameters, .examples, by = c("register","dynamic","tempo", "articulation")))
+```
+
+
+### Parse comparisons from text
+Here is the text of the rest of the guidance on comparisons. We can parse these into a data frame that can be iterated over to guide the comparison tests.
+```{r 'Parse comparisons from email'}
+.comparisons <- "
+1 to 2, 3, 4, 5, 6, 7
+
+Also, each first extreme to the other:
+2 to 3
+4 to 5
+6 to 7
+
+First extreme to second in pairs (conflates the two steps above):
+2 to 32 & 34
+3 to 33 & 35
+4 to 33 & 34
+5 to 35
+
+Impact of the third change across the board:  
+24 to 28 
+25 to 29
+27 to 31  
+26 to 30
+26 to 27 (in many of these no prior pair to compare)
+28 to 29
+24 to 25
+30 to 31
+
+And of course,  from 2 extreme to 3 (connects to the set above)
+32 to 24 & 28
+33 to 25 & 29
+34 to 26 & 30
+35 to 27 & 31
+
+Could test which parameter has the most impact: (examples below are 3 extreme, add fourth)
+15 to 11 (tempo changed) vs. 
+15 to 14 (dynamic changed, slow tempo) vs. 
+11 to 10 (dynamic changed , fast tempo)
+
+ 3rd to 4th change:
+24 to 8 & 20
+25 to 9 & 21
+26 to 10 & 22
+27 to 11 & 23
+28 to 12 & 16
+29 to 13 & 17
+30 to 14 & 18
+31 to 15 & 19"
+.comparisons <- strsplit(.comparisons, "\\n")[[1]]
+# Extract the numbers for comparison
+.init <- list()
+.init$example <- .comparisons %>% str_extract_all("^[\\d]{1,2}")
+.init$comparisons <- .comparisons %>% 
+  # Get everything after to
+  str_extract_all("(?<=to\\s).*") %>% 
+  # extract all digits
+  purrr::map(~ {ifelse(is_character(., n = 1), str_extract_all(., "[0-9]+"), NA)}) %>% 
+  purrr::map(unlist)
+# Retrieve all starter examples
+.guide <- purrr::map(1:35, .ex = .init$example, .co = .init$comparisons, function(.x, .ex, .co) {
+  # map through the starting example to find matches, if a match, then output the comparison example no.s
+  if (.x %in% as.numeric(.ex)) {
+    purrr::map2(.ex, .co, .i = .x, function(.x, .y, .i) {
+      .go <- try({length(.x) > 0 && !is.na(.x) && as.numeric(.x) == .i})
+      if (.go) {
+        as.numeric(.y)
+      } else {
+        NULL
+      }
+    }) %>% unlist
+  } else {
+    NULL
+  }
+})
+# Turn this into a nested tibble
+guide <- purrr::imap_dfr(.guide, ~{
+  if (!is.null(.x)) {
+    .co <- .x
+  } else {
+    .co <- NA
+  }
+  tibble(example = .y, comparisons = list(.co))
+})
+# Add the refer
+# put these to Google sheets for John to take a look at
+# .ssid <- googlesheets4::sheets_create("Comparisons")
+# ss <- googlesheets4::sheets_get(.ssid)
+# googlesheets4::sheets_write(ss = ss, data = comparisons)
+```
+
+### 1:1 $\chi^2$ for Comparisons
+The study design is the primary consideration for choosing the appropriate statistical measures to make claims about the associations in the data. The parameters and tones are categorical variables, where each of the parameter levels are ordered. The data is highly unbalanced as the randomization did not give each example the same exposure. Due to these constraints, the most appropriate test is $\chi^2$.
+
+
+### Summarize Data for Examples
+```{r 'Summarize results'}
+summarize_results <- function(.example, .dat, opts = opts, type = c("freq", "normal")[1]) {
+ # print(type)
+  .out <- purrr::imap(.example, ~{
+    .vars <- 1:5 %>% as.character %>% purrr::map(as.symbol)
+    .dat_filtered <- .dat %>% filter_at(vars(!!!.vars), any_vars(as.character(.) == as.character(.x)))
+    .enc_ind <- apply(.dat_filtered[, purrr::map_chr(1:5, as.character)], 1, .x = .x, function(.r, .x){
+      names(.r)[which(as.character(.r) == as.character(.x))]
+     }) %>% unique()
+    if (is.null(.enc_ind)) return(NULL)
+    # Create an index of column symbols corresponding to the encounter data columns
+    .cols <- paste0(.enc_ind, ".encounter") %>% purrr::map(as.symbol) 
+    # Select those columns
+    .tone_dat <- .dat_filtered %>% select(!!!.cols) 
+    # Create a regex of the tones
+    .reg <-
+      opts$tone$tone %>%
+      as.character() %>%
+      paste0(collapse = "|") %>%
+      regex()
+    # Extract all the tone tokens from the responses
+    .all_tokens <- str_match_all(.tone_dat[[1]], .reg)
+    # Compute the proportions
+    if (type == "freq") {
+      .total_freq <- unlist(.all_tokens) %>% table() %>% prop.table()  
+    } else {
+      .total_freq <-  unlist(.all_tokens) %>% table() %>% scale() %>% t %>% .[1,]
+    }
+    
+    # Fill the tone df with the props
+    .out <- opts$tone %>% select(-`desc`)
+    .out$freq <-
+          opts$tone$tone %>%
+          purrr::map_dbl(.freq = .total_freq, function(.x, .freq) {
+            ifelse(is.na(.freq[as.character(.x)]), 0, .freq[as.character(.x)])
+          })       
+    .out$count <- purrr::map_dbl(.out$freq %>% set_names(value = .out$tone), .t = nrow(.tone_dat), function(.x,.t){round(.x * .t, 0)})
+    .out
+  })
+  .out
+}
+# single_var_props <- summarize_results(test_parameters %>% filter(!is.na(example)) %>% extract2("example") %>% {set_names(., value = .)}, dat_flat, opts)
+```
+The data for each of the examples that will be used in the comparisons above must be summarized to prepare for the $\chi^2$ tests.
+```{r 'Summarize data for all comparison examples'}
+all_results <- summarize_results(1:35, dat_flat, opts)
+names(all_results) <- 1:35
+all_results <- purrr::compact(all_results)
+```
+
+Now all of the encounters for a given example are summarized as counts and frequencies of the tones associated with that example. Here are the results for the 35th example:
+```{r 'Show 35th'}
+all_results$`35` %>% kableExtra::kable("html") %>% kableExtra::kable_styling(position = "center")
+```
+
+## $\chi^2$ Tests
+The `guide` table can be iterated over to guide the $\chi^2$ comparisons.
+The output for each test needs to be easily discernible. To make them discernible, the example numbers will need to appear alongside the actual combination of parameters using in the example. We can join the parameters pertaining to each example with the guide table to make this possible.
+```{r 'Join Examples and Comparisons'}
+# They share the example column
+comparisons <- left_join(.examples %>% mutate_at(vars(- one_of("example")), as.factor), guide, by = "example")
+# The google sheet was updated with this info
+comparisons %>% kableExtra::kable("html") %>% kableExtra::kable_styling(position = "center")
+```
+
+```{r 'Iterative Chisquared'}
+# Split according to the comparisons that will be made
+all_chisq <- apply(comparisons, 1, .all_results = all_results, .comparisons = comparisons, function(r, .all_results, .comparisons) {
+  # Get the comparisons to be performed
+  
+  .compare <- unlist(r$comparisons) %>%
+    purrr::keep(!is.na(.)) %>%
+    trimws() %>%
+    as.numeric %>%
+    {set_names(., .)}
+  # if no comparisons, return null
+  .example <- as.numeric(trimws(r["example"]))
+  if(length(.compare) < 1) return(NULL)
+  # for each comparison use example and comparison identifier to index into results and retrieve the data,
+  purrr::imap(.compare, function(.x, .y){
+    .out <- chisq.test(
+    x = rbind(.all_results[[.example]]$count,
+    .all_results[[.x]]$count),
+    simulate.p.value = T
+    )
+    .out[["data.name"]] <-
+      tibble(Parameter = names(opts$params),
+             (!!glue::glue("Example: {.example}")) := .comparisons[.example, names(opts$params)] %>% unlist %>% as.character(),
+             (!!glue::glue("Comparison: {.x}")) := .comparisons[.x, names(opts$params)] %>% unlist %>% as.character())
+      # paste0(
+      #   paste0(
+      #     paste0(
+      #       names(opts$params),":" , 
+      #     ),
+      #     collapse = "|"
+      #   ),
+      # " v ",
+      # paste0(
+      #     paste0(
+      #       names(opts$params),":" , 
+      #     ),
+      #     collapse = "|"
+      #   )
+      # )
+    .out
+  })
+
+  
+})
+```
+
+
+## Correlations between parameter and tone
+In working with the data, we became curious about general correlation between parameters and attributions of tone. The attributions of tone by example are summarized and normalized. 
+```{r 'Bind parameters with outcomes'}
+dat_summary <- summarize_results(.examples$example, dat_flat, opts, type = "normal")
+dat_freq <- purrr::map(dat_summary, ~{
+  .x[,1:2] %>%
+    t %>%
+    as_tibble() %>%
+    set_names(value = .[1,]) %>%
+    extract(-1,)
+  }) %>% bind_rows(.id = "id")
+```
+
+The frequencies by example are then joined with the corresponding parameters for ease of labelling and differentiating results.
+```{r 'Summarize Frequencies by Example'}
+# apply(.examples, 1, .params = opts$variations, function(.r, .params) {
+#   .params %>% filter_all(all_vars)
+# })
+.examples_factors <- nest_join(.examples, opts$variations, by = c("register","dynamic", "tempo", "articulation"), keep = T) %>% unnest %>% 
+  select(- example) %>% 
+  rename(example = "articulation") %>% 
+  select(ends_with("1"), example) %>% 
+  rename_at(vars(ends_with("1")), ~ {str_replace(., "1$", "")})
+sets_x_freq <- left_join(dat_freq, .examples_factors %>% mutate_at(vars(example), as.character), by = c("id" = "example"))
+names(sets_x_freq)[1:9] <- str_c(names(sets_x_freq)[1:9], "_tone")
+names(sets_x_freq)[11:14] <- str_c(names(sets_x_freq)[11:14], "_par")
+```
+
+
+Linear regression is then used to determine the degree of association between the specific tone and the parameters. The top two parameters that show the highest $\beta$ values, indicating they have the largest effect on the perception of that tone, are listed with corresponding $\beta$ and $\text{Adjusted}\ R^2$ values. The $\beta$ value indicates the magnitude of effect that the shift in parameter has on the perception of tone. Given that the parameters are ordered, a negative value indicates that as the level of the parameter decreases, the association with the tone increases. The $\text{Adjusted}\ R^2$ on a scale from 0-1 indicates how well the parameter explains the variation in attribution of the tone, ie the higher the value the stronger the explanatory value of the association between the parameter and tone. 
+
+<div id="tonepar"></div>
+
+```{r 'Correlation Matrix of Parameter Sets with Tone', results='asis'}
+# psych::corPlot(cor(sets_x_freq %>% select(ends_with("tone")) %>% mutate_all(as.numeric), sets_x_freq %>% select(ends_with("par")) %>% mutate_all(as.numeric)), symmetric = F, numbers = T)
+.formulae <- purrr::map(str_subset(names(sets_x_freq), "tone$"), ~{
+  str_subset(names(sets_x_freq), "par$") %>% paste0(collapse = " + ") %>% {paste0(paste0(.x, " ~ "), .)} %>% as.formula()
+})
+names(.formulae) <- str_subset(names(sets_x_freq), "tone$")
+tone_parameter_associations <- purrr::imap(.formulae, ~{
+ .out <- lm(.x, data = sets_x_freq %>% mutate_at(vars(ends_with("par")), as.numeric))
+ .top2 <- sort(abs(.out[["coefficients"]][-1])) %>% tail(2) %>% names
+ .out <- c(.out[["coefficients"]][.top2],"R2" = summary(.out)[["r.squared"]]) %>% as.data.frame %>% t
+})
+tone_parameter_associations %>% purrr::iwalk(~{
+  tagList(
+  tags$strong(.y),
+ HTML(.x %>% kableExtra::kable("html") %>% kableExtra::kable_styling(position = "center"))
+  ) %>% print
+  })
+
+```
+
+
+## Conclusions{#conclusions}
+### Chi-squared comparisons{#chi}
+
+```{r 'All Significant Chi'}
+all_sig <- purrr::map_depth(all_chisq %>% purrr::set_names(nm = 1:length(all_chisq)), 2, ~{
+  
+      if(is.null(.x) || is_empty(.x) || is.na(.x[["p.value"]])) return(NULL)
+      if (.x[["p.value"]] < .1){
+          return(.x)
+      } else {
+          return(NULL)
+      }
+    }) %>% purrr::map(purrr::compact) %>% purrr::compact()
+```
+Now that all of the $\chi^2$ Tests have been performed, we can filter for the comparisons that resulted in a statistically significant shift in tone and display them in the tables below.
+
+```{r 'Display Chisq results', results='asis'}
+purrr::iwalk(all_sig, ~ {
+  if (length(.x) < 1) {
+    # If no comparisons were made
+    print(p("No Comparisons"))
+  } else {
+    # map over comparisons
+    tagList(
+      h4(.y),
+      purrr::map(.x, ~ {
+        tagList(
+          HTML(.x$data.name %>%
+            # split by each side of test
+            kableExtra::kable("html") %>%
+            kableExtra::kable_styling(position = "center")),
+          HTML(glue::glue("&chi;<sup>2</sup> (N={sum(.x$observed)}) = {round(.x$statistic, 2)}, {HDA::p.txt(.x$p.value)}"))
+        )
+      })
+    ) %>% print
+    
+  }
+  
+})
+```
+
+### General associations between tone and parameter 
+Cohen (1992) provides thresholds for determining the magnitude of effect sizes as follows: |d|<0.2 "negligible", |d|<0.5 "small", |d|<0.8 "medium", otherwise "large". These can be applied to the $\text{Adjusted}\ R^2$ to highlight the most notable associations between tone and parameter: `r tone_parameter_associations[{purrr::map_dbl(tone_parameter_associations, magrittr::extract, 3) > .2} %>% which] %>% names %>% str_extract(".*(?=\\_)") %>% paste(collapse = ", ")`.
+The <a href="#tonepar">tables above</a> allow us to draw the following conclusions:
+ * the perception of an energetic tone has a small association with increases in the level of tempo and articulation.
+ * the perception of a gentle tone has a small association with a decrease in dynamic and an increase in register.
+ * the perception of playfulness has a small association with an increase in articulation and a decrease in register.
+ * the perception of being moved has a small association with a decrease in dynamic and a decrease in tempo.
+ 
+
+
+
+
