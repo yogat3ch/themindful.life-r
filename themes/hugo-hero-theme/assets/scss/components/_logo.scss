@@ -3,9 +3,11 @@
   @include media-breakpoint-up(md) {
     display: block;
     width: 190px;
-    margin-left: -2.2%;
     margin-top: -1px;
     margin-inline-end: auto;
+  }
+  @include media-breakpoint-up(lg) {
+    margin-left: -10px
   }
   img {
     width: 100%;
@@ -33,10 +35,13 @@
   width: 80px;
   padding: 10px 0 10px 0;
   margin-inline-end: auto;
-  @include media-breakpoint-down(md) {
-    margin-left: 6%;
+  @include media-breakpoint-between(xs, sm) {
+    margin-left: 6px;
   }
-  @include media-breakpoint-up(sm) {
+  @include media-breakpoint-between(sm, md) {
+    margin-left: 2 * 6px
+  }
+  @include media-breakpoint-up(md){
     display: none;
   }
   img {

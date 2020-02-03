@@ -19,7 +19,7 @@
 
 .main-menu {
   display: none;
-  @include media-breakpoint-up(lg) {
+  @include media-breakpoint-up(md) {
     display: none;
   }
   &.rollOut {

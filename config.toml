@@ -25,7 +25,13 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
   themeColor1 = "blue darken-4"
   themeColor2text = "deep-orange-text accent-4"
   showPostSummary = true
-
+  # Set to true to disable code folding
+  disable_codefolding = false
+  # Set to "hide" or "show" all codes by default
+  codefolding_show = "hide"
+  # Set to true to exclude the "Show/hide all" button
+  codefolding_nobutton = false
+  
   MathJaxCDN = "//cdnjs.cloudflare.com/ajax/libs"
   MathJaxVersion = "2.7.5"
 
@@ -102,5 +108,5 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
     weight = 6
 
 [permalinks]
-  post = "/:year/:month/:day/:slug/"
+  post = "/:year/:month/:slug/"
   pages = "/:filename/"

@@ -13,14 +13,14 @@
   align-items: center;
   flex-direction: column;
   padding-top: 80px;
-  & .sub-menu {
+  & .sub-menu li {
     font-size:.75em;
   }
   &.open {
     opacity: 0.9;
     visibility: visible;
     height: 100%;
-    z-index: 20;
+    z-index: 10;
     background-color: $soft-white;
     li {
       animation: fadeInRight 0.5s ease forwards;
@@ -45,7 +45,6 @@
   & ul {
     width: 100%;
     background: $menu-bg;
-    font-size: 2rem;
     font-family: $font-family-heading;
     text-align: center;
     list-style: none;
@@ -56,7 +55,7 @@
       display: block;
       position: relative;
       opacity: 0;
-      font-size: 13px;
+      font-size: 2rem;
       a {
         text-transform: uppercase;
         display: block;
