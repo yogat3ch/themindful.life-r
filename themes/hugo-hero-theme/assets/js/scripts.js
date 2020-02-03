@@ -8,7 +8,7 @@ menuTrigger.onclick = function() {
     menuTrigger.classList.toggle('is-active')
     body.classList.toggle('lock-scroll')
 };
-if (screen.width > 992) {
+if (screen.width > 768) {
     menuTrigger.addEventListener("mouseover", mouseOver)
     header.addEventListener("mouseleave", mouseLeave)
 

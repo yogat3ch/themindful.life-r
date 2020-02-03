@@ -1,0 +1,12 @@
+{
+    "scripts" : [
+        "js/libs/font-awesome5.12.js",
+        "js/libs/jquery3.4.1.min.js",
+        "js/libs/sticky1.2.2.min.js",
+        "js/libs/collapse.js",
+        "js/libs/dropdown.js",
+        "js/libs/transition.js",
+        "js/libs/codefolding.js",
+        "js/scripts.js"
+    ]
+}

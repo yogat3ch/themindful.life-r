@@ -1,8 +1,9 @@
 {{ define "header_css" }}
-{{partial "materialize.html" . }}
+{{partial "materialize.html" }}
 {{ end }}
 {{ define "body_classes" }}page-posts-single{{ end }}
-{{ define "header_classes" }}{{ end }}
+{{ define "header_classes" }}
+{{ end }}
 
 {{ define "main" }}
 {{ partial "hero-image-setheight.html" (dict "background" .Params.heroBackground "heading" .Params.heroHeading "subheading" .Params.heroSubHeading "section" .Section "content" .)}}
@@ -43,6 +44,7 @@
         {{ with .Params.featured_image }}
         <img src="{{ . | urlize }}" alt="featured image" class="featured_image">
         {{ end }}
+        {{ partial "header_maincodefolding.html" . }}
         <div class="content">{{.Content}}</div>
       </div>
     </div>
