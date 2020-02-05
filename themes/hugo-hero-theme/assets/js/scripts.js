@@ -32,14 +32,14 @@ var _reveal = id => {
     
 };
 // Make header sticky
-var sticky = new Sticky('.header');
+var sticky = new Sticky('#wrapper > .header');
 $(window).on("scroll", function(){
     var scrollTop = $(window).scrollTop()
     console.log(scrollTop)
     if (scrollTop > 1 ) {
-        $(".header").addClass("is-sticky")
+        $('#wrapper > .header').addClass("is-sticky")
     } else if (scrollTop < 1) {
-        $(".header").removeClass("is-sticky")
+        $('#wrapper > .header').removeClass("is-sticky")
     }
 })
 
