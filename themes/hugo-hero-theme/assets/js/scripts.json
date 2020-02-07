@@ -7,6 +7,7 @@
         "js/libs/dropdown.js",
         "js/libs/transition.js",
         "js/libs/codefolding.js",
+        "js/libs/math-code.js",
         "js/scripts.js"
     ]
 }

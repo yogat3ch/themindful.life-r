@@ -5,6 +5,7 @@ date: '`r format(Sys.time(), "%Y-%m-%d")`'
 heroHeading: "Just Listening - Analysis"
 heroSubHeading: "Statistics of Sound"
 slug: just-listening-analysis
+type: post
 categories: ["R", "Analysis"]
 tags: ["Music", "Musical Composition", "Composition", "Chi squared"]
 draft: yes
