@@ -1,7 +1,7 @@
 ---
 title: "Just Listening - Analysis"
 author: "John Morrison & Stephen Holsenbeck"
-date: '2020-02-06'
+date: '2020-02-02'
 heroHeading: "Just Listening - Analysis"
 heroSubHeading: "Statistics of Sound"
 slug: just-listening-analysis
@@ -35,6 +35,8 @@ output:
 <script src="/r/rmarkdown-libs/kePrint/kePrint.js"></script>
 
 
+<div id="just-listening" class="section level1">
+<h1>Just Listening</h1>
 <div id="study-description" class="section level2">
 <h2>Study Description</h2>
 <p><em>Note:</em> terminology used throughout this article have their first instance italicized. Each unitalicized reference to this term will imply this specific term and it’s definition for this study.
@@ -43,12 +45,12 @@ The study involved the creation of 35 musical <em>examples</em> performed by Joh
     &quot;mp&quot;, &quot;ff&quot;), tempo = c(&quot;Molto Largo&quot;, &quot;Moderato&quot;, &quot;Prestissimo&quot;), articulation = c(&quot;legato&quot;, 
     &quot;neutral&quot;, &quot;staccato&quot;)), variations = expand.grid(purrr::map(params, ~{
     factor(.x, levels = .x)
-})), tone = c(&quot;0 Other&quot;, &quot;1 Forceful: aggressive, piercing, angry, shocking&quot;, &quot;2 Assertive: bold, stern, decisive, declamatory&quot;, 
+})), affect = c(&quot;0 Other&quot;, &quot;1 Forceful: aggressive, piercing, angry, shocking&quot;, &quot;2 Assertive: bold, stern, decisive, declamatory&quot;, 
     &quot;3 Energetic: brave, frantic, lively, angular&quot;, &quot;4 Light: airy, dreamy, bright, delicate&quot;, 
     &quot;5 Gentle: sweet, pleasant, shy, calm&quot;, &quot;6 Playful: cheerful, dancing, joking, jaunty&quot;, 
     &quot;7 Melancholy: sad, nostalgic, dark, longing&quot;, &quot;8 Moving: majestic, heroic, awe-inspiring&quot;) %&gt;% 
-    str_remove(&quot;\\d\\s&quot;) %&gt;% as_data_frame() %&gt;% separate(value, into = c(&quot;tone&quot;, 
-    &quot;desc&quot;), sep = &quot;\\:\\s&quot;) %&gt;% replace_na(list(desc = &quot;other&quot;)) %&gt;% mutate_at(vars(tone), 
+    str_remove(&quot;\\d\\s&quot;) %&gt;% as_data_frame() %&gt;% separate(value, into = c(&quot;affect&quot;, 
+    &quot;desc&quot;), sep = &quot;\\:\\s&quot;) %&gt;% replace_na(list(desc = &quot;other&quot;)) %&gt;% mutate_at(vars(affect), 
     ~{
         factor(., levels = .)
     }))
@@ -108,13 +110,13 @@ DT::datatable()</code></pre>
 <div id="htmlwidget-1" style="width:100%;height:auto;" class="datatables html-widget"></div>
 <script type="application/json" data-for="htmlwidget-1">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35"],["mid","mid","mid","mid","mid","mid","mid","high","high","high","high","high","high","high","high","low","low","low","low","low","low","low","low","mid","mid","mid","mid","mid","mid","mid","mid","mid","mid","mid","mid"],["mp","ppp","ff","mp","mp","mp","mp","ff","ff","ppp","ff","ppp","ff","ppp","ff","ppp","ff","ppp","ff","ppp","ff","ppp","ff","ppp","ff","ppp","ff","ppp","ff","ppp","ff","ppp","ff","ppp","ff"],["Moderato","Moderato","Moderato","Moderato","Moderato","Largo","Prestissimo","Prestissimo","Prestissimo","Prestissimo","Prestissimo","Largo","Largo","Largo","Largo","Largo","Largo","Largo","Largo","Prestissimo","Prestissimo","Prestissimo","Prestissimo","Prestissimo","Prestissimo","Prestissimo","Prestissimo","Largo","Largo","Largo","Largo","Moderato","Moderato","Moderato","Moderato"],["neutral","neutral","neutral","legato","staccato","neutral","neutral","legato","legato","staccato","staccato","legato","legato","staccato","staccato","legato","legato","staccato","staccato","legato","legato","staccato","staccato","legato","legato","staccato","staccato","legato","legato","staccato","staccato","legato","legato","staccato","staccato"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>register<\/th>\n      <th>dynamic<\/th>\n      <th>tempo<\/th>\n      <th>articulation<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}]}},"evals":[],"jsHooks":[]}</script>
 <p>Subjects voluntarily took a survey in which they were randomized to <em>encounter</em> five examples each. Some subjects experienced the examples at random where multiple parameters could change dramatically from encounter to encounter. Others experienced (a random set of examples) that were selected in sequential order from the examples, where parameters changed incrementally from one encounter to the next.</p>
-<p>For each encounter a subject was prompted to rate their subjective assessment of the <em>tone</em> of the example, and the strength to which they attributed the tone to the example.
-The tones and their descriptions are listed below:</p>
-<pre class="r"><code>opts$tone</code></pre>
+<p>For each encounter a subject was prompted to rate their subjective assessment of the <em>affect</em> of the example, and the strength to which they attributed the affect to the example.
+The affects and their descriptions are listed below:</p>
+<pre class="r"><code>opts$affect</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="left">tone</th>
+<th align="left">affect</th>
 <th align="left">desc</th>
 </tr>
 </thead>
@@ -163,14 +165,19 @@ The tones and their descriptions are listed below:</p>
 <p>The raw data was collected via Google Spreadsheet. Each row corresponds to an observation, except where responses were separate by randomization group. Here we use <code>googlesheets4</code> to read the data from the google sheet. The column names are non-standard, so standardized column names are applied. Rows where randomization group are labelled are removed and the sheet is split into a list containing the corresponding observations.</p>
 <pre class="r"><code>.dat_raw &lt;- googlesheets4::read_sheet(&quot;https://docs.google.com/spreadsheets/d/1k174OGNWjmUXtzzo0-v99ABH80V2cw2KDek630FsCL8/edit#gid=2004007850&quot;, 
     range = &quot;&#39;Form Responses 1&#39;!A:Z&quot;, col_names = F)
+# Get the rows where sections begin &amp; end by their null value and create a run
+# length encoding
 .sections &lt;- purrr::map_lgl(.dat_raw[[1]], is.null) %&gt;% {
     HDA::rleIndex(rle(.))
 }
+# Parse the run length encoding to get vectors of the row indices for each
+# section
 .sections_ind &lt;- apply(.sections, 1, .dat_raw = .dat_raw, function(.r, .dat_raw) {
     if (.r[&quot;values&quot;] == F) {
         .out &lt;- (.r[&quot;start&quot;] + 1):.r[&quot;end&quot;]
     } else NULL
 }) %&gt;% purrr::compact()
+# Split the data into the respective sections
 .dat_sections &lt;- apply(.sections, 1, .dat_raw = .dat_raw, function(.r, .dat_raw) {
     if (.r[&quot;values&quot;] == F) {
         .out &lt;- .dat_raw[(.r[&quot;start&quot;] + 1):.r[&quot;end&quot;], ]
@@ -183,22 +190,6 @@ The tones and their descriptions are listed below:</p>
 .dat_sections[[7]] &lt;- .dat_sections[[7]][-6, ]
 # Rename according to the trial
 names(.dat_sections) &lt;- as.character(20:1)</code></pre>
-<p>The proportion of each tone selected in each encounter, by each randomization group is summarised here.</p>
-<pre class="r"><code>response_proportions &lt;- purrr::map(.dat_sections, ~{
-    .reg &lt;- opts$tone$tone %&gt;% as.character() %&gt;% paste0(collapse = &quot;|&quot;) %&gt;% regex()
-    .out &lt;- purrr::map(.x[, c(12, 15, 18, 21, 24)], .v = c(12, 15, 18, 21, 24), function(.x, 
-        .v) {
-        # .strength_table &lt;- .x[, c(.v, .v + 2)] as.character(opts$tone)
-        .all_tokens &lt;- str_match_all(.x, .reg)
-        .total_freq &lt;- unlist(.all_tokens) %&gt;% table() %&gt;% prop.table()
-        .out &lt;- opts$tone %&gt;% select(-desc)
-        .out$freq &lt;- opts$tone$tone %&gt;% purrr::map_dbl(.freq = .total_freq, function(.x, 
-            .freq) {
-            ifelse(is.na(.freq[as.character(.x)]), 0, .freq[as.character(.x)])
-        })
-        return(.out)
-    })
-})</code></pre>
 <p>The example and corresponding parameters for each encounter are listed in an accessible tabular format to the right of the form responses. These are matched to the encounter. Columns are renamed with legible and interpretable names.</p>
 <pre class="r"><code>.dat_params &lt;- googlesheets4::read_sheet(&quot;https://docs.google.com/spreadsheets/d/1uZiG2f2sZ1IeyNcGQUV9Nw-K_LDpAOMwAdtI5_ZED08/edit#gid=164770121&quot;, 
     range = &quot;&#39;Form Responses (dealing with mulitples)&#39;!AV1:EV474&quot;, col_names = F)
@@ -229,18 +220,20 @@ names(.dat_params) &lt;- names(.col_names)
 })
 # Remove a row corresponding to the invalid entry
 .param_vals[[7]] &lt;- .param_vals[[7]][-6, ]
-dat_flat &lt;- purrr::map2(.dat_sections, .param_vals, cbind.data.frame) %&gt;% bind_rows(.id = &quot;sets&quot;) %&gt;% 
-    set_names(value = c(&quot;timestamp&quot;, &quot;name_email.dem&quot;, &quot;age.dem&quot;, &quot;gender.dem&quot;, &quot;ctry.dem&quot;, 
-        &quot;ed.dem&quot;, &quot;music_train.dem&quot;, &quot;music_desc.dem&quot;, &quot;place.dem&quot;, &quot;loc.dem&quot;, &quot;referral.dem&quot;, 
-        paste0(rep(1:5, each = 3), &quot;.&quot;, c(&quot;encounter&quot;, &quot;other&quot;, &quot;strength&quot;)), 1:5, 
-        &quot;sets&quot;))</code></pre>
+# bind the number of each of the 5 encounters to the observation
+dat_flat &lt;- purrr::map2(.dat_sections, .param_vals, cbind.data.frame) %&gt;% # combine into df
+bind_rows(.id = &quot;sets&quot;) %&gt;% # name accordingly
+set_names(value = c(&quot;sets&quot;, &quot;timestamp&quot;, &quot;name_email.dem&quot;, &quot;age.dem&quot;, &quot;gender.dem&quot;, 
+    &quot;ctry.dem&quot;, &quot;ed.dem&quot;, &quot;music_train.dem&quot;, &quot;music_desc.dem&quot;, &quot;place.dem&quot;, &quot;loc.dem&quot;, 
+    &quot;referral.dem&quot;, paste0(rep(1:5, each = 3), &quot;.&quot;, c(&quot;encounter&quot;, &quot;other&quot;, &quot;strength&quot;)), 
+    1:5))</code></pre>
 <div id="purpose-and-hypotheses-of-this-analysis" class="section level3">
 <h3>Purpose and hypotheses of this analysis</h3>
 <p>With this analysis we intend to discover if:
-<span class="math inline">\(H_a\)</span>. A shift in a specific parameter causes a shift in the assessment of tone, and if so what magnitude of shift in a parameter (ie low - mid or low - high etc) results in a change in the assessment of tone.
-<span class="math inline">\(H_{a0}\)</span> The general null hypothesis is to assume that shifts in all levels of all parameters will have no effect on tone.</p>
-<p><span class="math inline">\(H_b\)</span>. If there are associations between a specific parameter and a specific tone, and if so what degree of association there is.
-<span class="math inline">\(H_{b0}\)</span> The null hypothesis is to assume that there is no association between a specific parameter and a specific tone.</p>
+<br><span class="math inline">\(H_a\)</span>. A shift in a specific parameter causes a shift in the assessment of affect, and if so what magnitude of shift in a parameter (ie low - mid or low - high etc) results in a change in the assessment of affect.
+<br><span class="math inline">\(H_{a0}\)</span> The general null hypothesis is to assume that shifts in all levels of all parameters will have no effect on affect.</p>
+<p><br><span class="math inline">\(H_b\)</span>. If there are associations between a specific parameter and a specific affect, and if so what degree of association there is.
+<br><span class="math inline">\(H_{b0}\)</span> The null hypothesis is to assume that there is no association between a specific parameter and a specific affect.</p>
 </div>
 </div>
 <div id="analysis" class="section level2">
@@ -435,7 +428,7 @@ guide &lt;- purrr::imap_dfr(.guide, ~{
 </div>
 <div id="chi2-for-comparisons" class="section level3">
 <h3>1:1 <span class="math inline">\(\chi^2\)</span> for Comparisons</h3>
-<p>The study design is the primary consideration for choosing the appropriate statistical measures to make claims about the associations in the data. The parameters and tones are categorical variables, where each of the parameter levels are ordered. The data is highly unbalanced as the randomization did not give each example the same exposure. Due to these constraints, the most appropriate test is <span class="math inline">\(\chi^2\)</span>.</p>
+<p>The study design is the primary consideration for choosing the appropriate statistical measures to make claims about the associations in the data. The parameters and affects are categorical variables, where each of the parameter levels are ordered. The data is highly unbalanced as the randomization did not give each example the same exposure. Due to these constraints, the most appropriate test is <span class="math inline">\(\chi^2\)</span>.</p>
 </div>
 <div id="summarize-data-for-examples" class="section level3">
 <h3>Summarize Data for Examples</h3>
@@ -448,18 +441,18 @@ guide &lt;- purrr::imap_dfr(.guide, ~{
         .enc_ind &lt;- apply(.dat_filtered[, purrr::map_chr(1:5, as.character)], 1, 
             .x = .x, function(.r, .x) {
                 names(.r)[which(as.character(.r) == as.character(.x))]
-            }) %&gt;% unique()
+            })
         if (is.null(.enc_ind)) 
             return(NULL)
         # Create an index of column symbols corresponding to the encounter data columns
         .cols &lt;- paste0(.enc_ind, &quot;.encounter&quot;) %&gt;% purrr::map(as.symbol)
         # Select those columns
-        .tone_dat &lt;- .dat_filtered %&gt;% select(!!!.cols)
-        # Create a regex of the tones
-        .reg &lt;- opts$tone$tone %&gt;% as.character() %&gt;% paste0(collapse = &quot;|&quot;) %&gt;% 
+        .affect_dat &lt;- .dat_filtered %&gt;% select(!!!.cols)
+        # Create a regex of the affects
+        .reg &lt;- opts$affect$affect %&gt;% as.character() %&gt;% paste0(collapse = &quot;|&quot;) %&gt;% 
             regex()
-        # Extract all the tone tokens from the responses
-        .all_tokens &lt;- str_match_all(.tone_dat[[1]], .reg)
+        # Extract all the affect tokens from the responses
+        .all_tokens &lt;- str_match_all(.affect_dat[[1]], .reg)
         # Compute the proportions
         if (type == &quot;freq&quot;) {
             .total_freq &lt;- unlist(.all_tokens) %&gt;% table() %&gt;% prop.table()
@@ -468,14 +461,14 @@ guide &lt;- purrr::imap_dfr(.guide, ~{
                 .[1, ]
         }
         
-        # Fill the tone df with the props
-        .out &lt;- opts$tone %&gt;% select(-desc)
-        .out$freq &lt;- opts$tone$tone %&gt;% purrr::map_dbl(.freq = .total_freq, function(.x, 
+        # Fill the affect df with the props
+        .out &lt;- opts$affect %&gt;% select(-desc)
+        .out$freq &lt;- opts$affect$affect %&gt;% purrr::map_dbl(.freq = .total_freq, function(.x, 
             .freq) {
             ifelse(is.na(.freq[as.character(.x)]), 0, .freq[as.character(.x)])
         })
-        .out$count &lt;- purrr::map_dbl(.out$freq %&gt;% set_names(value = .out$tone), 
-            .t = nrow(.tone_dat), function(.x, .t) {
+        .out$count &lt;- purrr::map_dbl(.out$freq %&gt;% set_names(value = .out$affect), 
+            .t = nrow(.affect_dat), function(.x, .t) {
                 round(.x * .t, 0)
             })
         .out
@@ -489,7 +482,7 @@ guide &lt;- purrr::imap_dfr(.guide, ~{
 <pre class="r"><code>all_results &lt;- summarize_results(1:35, dat_flat, opts)
 names(all_results) &lt;- 1:35
 all_results &lt;- purrr::compact(all_results)</code></pre>
-<p>Now all of the encounters for a given example are summarized as counts and frequencies of the tones associated with that example. Here are the results for the 35th example:</p>
+<p>Now all of the encounters for a given example are summarized as counts and frequencies of the affects associated with that example. Here are the results for the 35th example:</p>
 <pre class="r"><code>all_results$`35` %&gt;% kableExtra::kable(&quot;html&quot;) %&gt;% kableExtra::kable_styling(position = &quot;center&quot;)</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -617,8 +610,9 @@ The output for each test needs to be easily discernible. To make them discernibl
 comparisons &lt;- left_join(.examples %&gt;% mutate_at(vars(-one_of(&quot;example&quot;)), as.factor), 
     guide, by = &quot;example&quot;)
 # The google sheet was updated with this info
-comparisons %&gt;% kableExtra::kable(&quot;html&quot;) %&gt;% kableExtra::kable_styling(position = &quot;center&quot;)</code></pre>
-<table class="table" style="margin-left: auto; margin-right: auto;">
+comparisons %&gt;% kableExtra::kable(&quot;html&quot;) %&gt;% kableExtra::kable_styling(position = &quot;center&quot;, 
+    bootstrap_options = c(&quot;striped&quot;, &quot;responsive&quot;))</code></pre>
+<table class="table table-striped table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:right;">
@@ -1374,50 +1368,596 @@ all_chisq &lt;- apply(comparisons, 1, .all_results = all_results, .comparisons =
         
     })</code></pre>
 </div>
-<div id="correlations-between-parameter-and-tone" class="section level2">
-<h2>Correlations between parameter and tone</h2>
-<p>In working with the data, we became curious about general correlation between parameters and attributions of tone. The attributions of tone by example are summarized and normalized.</p>
-<pre class="r"><code>dat_summary &lt;- summarize_results(.examples$example, dat_flat, opts, type = &quot;normal&quot;)
-dat_freq &lt;- purrr::map(dat_summary, ~{
-    .x[, 1:2] %&gt;% t %&gt;% as_tibble() %&gt;% set_names(value = .[1, ]) %&gt;% extract(-1, 
-        )
-}) %&gt;% bind_rows(.id = &quot;id&quot;)</code></pre>
+<div id="correlations-between-parameter-and-affect" class="section level2">
+<h2>Correlations between parameter and affect</h2>
+<p>In working with the data, we became curious about general correlation between parameters and attributions of affect. The attributions of affect by example are summarized and normalized.</p>
+<pre class="r"><code>dat_freq &lt;- purrr::map(all_results, ~{
+    # Affect and Count
+    .x[, c(1, 3)] %&gt;% # transpose
+    t %&gt;% # to tibble
+    as_tibble() %&gt;% # set names to affect
+    set_names(value = .[1, ]) %&gt;% # remove affect row
+    extract(-1, ) %&gt;% mutate_all(as.numeric)
+}) %&gt;% # bind by the example #
+bind_rows(.id = &quot;id&quot;)</code></pre>
 <p>The frequencies by example are then joined with the corresponding parameters for ease of labelling and differentiating results.</p>
-<pre class="r"><code># apply(.examples, 1, .params = opts$variations, function(.r, .params) { .params
-# %&gt;% filter_all(all_vars) })
-.examples_factors &lt;- nest_join(.examples, opts$variations, by = c(&quot;register&quot;, &quot;dynamic&quot;, 
-    &quot;tempo&quot;, &quot;articulation&quot;), keep = T) %&gt;% unnest %&gt;% select(-example) %&gt;% rename(example = &quot;articulation&quot;) %&gt;% 
-    select(ends_with(&quot;1&quot;), example) %&gt;% rename_at(vars(ends_with(&quot;1&quot;)), ~{
-    str_replace(., &quot;1$&quot;, &quot;&quot;)
+<pre class="r"><code>sets_x_freq &lt;- left_join(dat_freq, .examples %&gt;% mutate_at(vars(example), as.character), 
+    by = c(id = &quot;example&quot;))
+names(sets_x_freq)[2:10] &lt;- str_c(names(sets_x_freq)[2:10], &quot;_affect&quot;)
+names(sets_x_freq)[11:14] &lt;- str_c(names(sets_x_freq)[11:14], &quot;_par&quot;)
+# factorize
+sets_x_freq[, 11:14] &lt;- purrr::imap(sets_x_freq %&gt;% select(ends_with(&quot;par&quot;)), ~{
+    .y &lt;- str_extract(.y, &quot;[a-z]+(?=\\_par)&quot;)
+    factor(.x, levels = opts$params[[.y]])
 })
-sets_x_freq &lt;- left_join(dat_freq, .examples_factors %&gt;% mutate_at(vars(example), 
-    as.character), by = c(id = &quot;example&quot;))
-names(sets_x_freq)[1:9] &lt;- str_c(names(sets_x_freq)[1:9], &quot;_tone&quot;)
-names(sets_x_freq)[11:14] &lt;- str_c(names(sets_x_freq)[11:14], &quot;_par&quot;)</code></pre>
-<p>Linear regression is then used to determine the degree of association between the specific tone and the parameters. The top two parameters that show the highest <span class="math inline">\(\beta\)</span> values, indicating they have the largest effect on the perception of that tone, are listed with corresponding <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\text{Adjusted}\ R^2\)</span> values. The <span class="math inline">\(\beta\)</span> value indicates the magnitude of effect that the shift in parameter has on the perception of tone. Given that the parameters are ordered, a negative value indicates that as the level of the parameter decreases, the association with the tone increases. The <span class="math inline">\(\text{Adjusted}\ R^2\)</span> on a scale from 0-1 indicates how well the parameter explains the variation in attribution of the tone, ie the higher the value the stronger the explanatory value of the association between the parameter and tone.</p>
-<div id="tonepar">
+head(sets_x_freq, 5) %&gt;% kableExtra::kable(&quot;html&quot;) %&gt;% kableExtra::kable_styling(position = &quot;center&quot;, 
+    bootstrap_options = c(&quot;striped&quot;, &quot;responsive&quot;))</code></pre>
+<table class="table table-striped table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:right;">
+Other_affect
+</th>
+<th style="text-align:right;">
+Forceful_affect
+</th>
+<th style="text-align:right;">
+Assertive_affect
+</th>
+<th style="text-align:right;">
+Energetic_affect
+</th>
+<th style="text-align:right;">
+Light_affect
+</th>
+<th style="text-align:right;">
+Gentle_affect
+</th>
+<th style="text-align:right;">
+Playful_affect
+</th>
+<th style="text-align:right;">
+Melancholy_affect
+</th>
+<th style="text-align:right;">
+Moving_affect
+</th>
+<th style="text-align:left;">
+register_par
+</th>
+<th style="text-align:left;">
+dynamic_par
+</th>
+<th style="text-align:left;">
+tempo_par
+</th>
+<th style="text-align:left;">
+articulation_par
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+48
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+45
+</td>
+<td style="text-align:right;">
+118
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+142
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+mid
+</td>
+<td style="text-align:left;">
+mp
+</td>
+<td style="text-align:left;">
+Moderato
+</td>
+<td style="text-align:left;">
+neutral
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+mid
+</td>
+<td style="text-align:left;">
+ppp
+</td>
+<td style="text-align:left;">
+Moderato
+</td>
+<td style="text-align:left;">
+neutral
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+mid
+</td>
+<td style="text-align:left;">
+ff
+</td>
+<td style="text-align:left;">
+Moderato
+</td>
+<td style="text-align:left;">
+neutral
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+mid
+</td>
+<td style="text-align:left;">
+mp
+</td>
+<td style="text-align:left;">
+Moderato
+</td>
+<td style="text-align:left;">
+legato
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+mid
+</td>
+<td style="text-align:left;">
+mp
+</td>
+<td style="text-align:left;">
+Moderato
+</td>
+<td style="text-align:left;">
+staccato
+</td>
+</tr>
+</tbody>
+</table>
+<p>Linear regression is then used to determine the degree of association between the specific affect and the parameters. The top two parameters that show the highest <span class="math inline">\(\beta\)</span> values, indicating they have the largest effect on the perception of that affect, are listed with corresponding <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\text{Adjusted}\ R^2\)</span> values. The <span class="math inline">\(\beta\)</span> value indicates the magnitude of effect that the shift in parameter has on the perception of affect. Given that the parameters are ordered, a negative value indicates that as the level of the parameter decreases, the association with the affect increases. The <span class="math inline">\(\text{Adjusted}\ R^2\)</span> on a scale from 0-1 indicates how well the parameter explains the variation in attribution of the affect, ie the higher the value the stronger the explanatory value of the association between the parameter and affect.</p>
+<div id="affectpar">
 
 </div>
-<pre class="r"><code># psych::corPlot(cor(sets_x_freq %&gt;% select(ends_with(&#39;tone&#39;)) %&gt;%
+<pre class="r"><code># psych::corPlot(cor(sets_x_freq %&gt;% select(ends_with(&#39;affect&#39;)) %&gt;%
 # mutate_all(as.numeric), sets_x_freq %&gt;% select(ends_with(&#39;par&#39;)) %&gt;%
 # mutate_all(as.numeric)), symmetric = F, numbers = T)
-.formulae &lt;- purrr::map(str_subset(names(sets_x_freq), &quot;tone$&quot;), ~{
+.formulae &lt;- purrr::map(str_subset(names(sets_x_freq), &quot;affect$&quot;), ~{
     str_subset(names(sets_x_freq), &quot;par$&quot;) %&gt;% paste0(collapse = &quot; + &quot;) %&gt;% {
         paste0(paste0(.x, &quot; ~ &quot;), .)
     } %&gt;% as.formula()
 })
-names(.formulae) &lt;- str_subset(names(sets_x_freq), &quot;tone$&quot;)
-tone_parameter_associations &lt;- purrr::imap(.formulae, ~{
+names(.formulae) &lt;- str_subset(names(sets_x_freq), &quot;affect$&quot;)
+affect_parameter_associations &lt;- purrr::imap(.formulae, ~{
     .out &lt;- lm(.x, data = sets_x_freq %&gt;% mutate_at(vars(ends_with(&quot;par&quot;)), as.numeric))
     .top2 &lt;- sort(abs(.out[[&quot;coefficients&quot;]][-1])) %&gt;% tail(2) %&gt;% names
     .out &lt;- c(.out[[&quot;coefficients&quot;]][.top2], R2 = summary(.out)[[&quot;r.squared&quot;]]) %&gt;% 
         as.data.frame %&gt;% t
 })
-tone_parameter_associations %&gt;% purrr::iwalk(~{
+affect_parameter_associations %&gt;% purrr::iwalk(~{
     tagList(tags$strong(.y), HTML(.x %&gt;% kableExtra::kable(&quot;html&quot;) %&gt;% kableExtra::kable_styling(position = &quot;center&quot;))) %&gt;% 
         print
 })</code></pre>
-<strong>Other_tone</strong>
+<strong>Other_affect</strong>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+articulation_par
+</th>
+<th style="text-align:right;">
+register_par
+</th>
+<th style="text-align:right;">
+R2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+.
+</td>
+<td style="text-align:right;">
+0.5666667
+</td>
+<td style="text-align:right;">
+-0.625
+</td>
+<td style="text-align:right;">
+0.0104598
+</td>
+</tr>
+</tbody>
+</table>
+<strong>Forceful_affect</strong>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+dynamic_par
+</th>
+<th style="text-align:right;">
+register_par
+</th>
+<th style="text-align:right;">
+R2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+.
+</td>
+<td style="text-align:right;">
+0.5333333
+</td>
+<td style="text-align:right;">
+-1.0625
+</td>
+<td style="text-align:right;">
+0.1205102
+</td>
+</tr>
+</tbody>
+</table>
+<strong>Assertive_affect</strong>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+dynamic_par
+</th>
+<th style="text-align:right;">
+register_par
+</th>
+<th style="text-align:right;">
+R2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+.
+</td>
+<td style="text-align:right;">
+1.866667
+</td>
+<td style="text-align:right;">
+-3.5625
+</td>
+<td style="text-align:right;">
+0.2456306
+</td>
+</tr>
+</tbody>
+</table>
+<strong>Energetic_affect</strong>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+articulation_par
+</th>
+<th style="text-align:right;">
+register_par
+</th>
+<th style="text-align:right;">
+R2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+.
+</td>
+<td style="text-align:right;">
+1.5
+</td>
+<td style="text-align:right;">
+-1.5
+</td>
+<td style="text-align:right;">
+0.3227889
+</td>
+</tr>
+</tbody>
+</table>
+<strong>Light_affect</strong>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+register_par
+</th>
+<th style="text-align:right;">
+dynamic_par
+</th>
+<th style="text-align:right;">
+R2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+.
+</td>
+<td style="text-align:right;">
+1.6875
+</td>
+<td style="text-align:right;">
+-2.2
+</td>
+<td style="text-align:right;">
+0.0899952
+</td>
+</tr>
+</tbody>
+</table>
+<strong>Gentle_affect</strong>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+dynamic_par
+</th>
+<th style="text-align:right;">
+register_par
+</th>
+<th style="text-align:right;">
+R2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+.
+</td>
+<td style="text-align:right;">
+-1.133333
+</td>
+<td style="text-align:right;">
+4.0625
+</td>
+<td style="text-align:right;">
+0.024808
+</td>
+</tr>
+</tbody>
+</table>
+<strong>Playful_affect</strong>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+register_par
+</th>
+<th style="text-align:right;">
+articulation_par
+</th>
+<th style="text-align:right;">
+R2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+.
+</td>
+<td style="text-align:right;">
+-1.75
+</td>
+<td style="text-align:right;">
+3.7
+</td>
+<td style="text-align:right;">
+0.252222
+</td>
+</tr>
+</tbody>
+</table>
+<strong>Melancholy_affect</strong>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+tempo_par
+</th>
+<th style="text-align:right;">
+register_par
+</th>
+<th style="text-align:right;">
+R2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+.
+</td>
+<td style="text-align:right;">
+-2.615385
+</td>
+<td style="text-align:right;">
+2.75
+</td>
+<td style="text-align:right;">
+0.0166181
+</td>
+</tr>
+</tbody>
+</table>
+<strong>Moving_affect</strong>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1440,285 +1980,13 @@ R2
 .
 </td>
 <td style="text-align:right;">
--0.0929133
+-0.2
 </td>
 <td style="text-align:right;">
-0.1268224
+0.4615385
 </td>
 <td style="text-align:right;">
-0.0390272
-</td>
-</tr>
-</tbody>
-</table>
-<strong>Forceful_tone</strong>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-articulation_par
-</th>
-<th style="text-align:right;">
-dynamic_par
-</th>
-<th style="text-align:right;">
-R2
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-.
-</td>
-<td style="text-align:right;">
--0.1031164
-</td>
-<td style="text-align:right;">
-0.1974251
-</td>
-<td style="text-align:right;">
-0.126261
-</td>
-</tr>
-</tbody>
-</table>
-<strong>Assertive_tone</strong>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-dynamic_par
-</th>
-<th style="text-align:right;">
-register_par
-</th>
-<th style="text-align:right;">
-R2
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-.
-</td>
-<td style="text-align:right;">
-0.2511035
-</td>
-<td style="text-align:right;">
--0.4061024
-</td>
-<td style="text-align:right;">
-0.1511121
-</td>
-</tr>
-</tbody>
-</table>
-<strong>Energetic_tone</strong>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-tempo_par
-</th>
-<th style="text-align:right;">
-articulation_par
-</th>
-<th style="text-align:right;">
-R2
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-.
-</td>
-<td style="text-align:right;">
-0.1908302
-</td>
-<td style="text-align:right;">
-0.2821432
-</td>
-<td style="text-align:right;">
-0.2771172
-</td>
-</tr>
-</tbody>
-</table>
-<strong>Light_tone</strong>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-register_par
-</th>
-<th style="text-align:right;">
-dynamic_par
-</th>
-<th style="text-align:right;">
-R2
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-.
-</td>
-<td style="text-align:right;">
-0.1767036
-</td>
-<td style="text-align:right;">
--0.2520421
-</td>
-<td style="text-align:right;">
-0.1133775
-</td>
-</tr>
-</tbody>
-</table>
-<strong>Gentle_tone</strong>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-dynamic_par
-</th>
-<th style="text-align:right;">
-register_par
-</th>
-<th style="text-align:right;">
-R2
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-.
-</td>
-<td style="text-align:right;">
--0.226173
-</td>
-<td style="text-align:right;">
-0.452956
-</td>
-<td style="text-align:right;">
-0.2709083
-</td>
-</tr>
-</tbody>
-</table>
-<strong>Playful_tone</strong>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-articulation_par
-</th>
-<th style="text-align:right;">
-register_par
-</th>
-<th style="text-align:right;">
-R2
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-.
-</td>
-<td style="text-align:right;">
-0.4402406
-</td>
-<td style="text-align:right;">
--0.4499285
-</td>
-<td style="text-align:right;">
-0.27975
-</td>
-</tr>
-</tbody>
-</table>
-<strong>Melancholy_tone</strong>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-register_par
-</th>
-<th style="text-align:right;">
-articulation_par
-</th>
-<th style="text-align:right;">
-R2
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-.
-</td>
-<td style="text-align:right;">
-0.2151719
-</td>
-<td style="text-align:right;">
--0.3128877
-</td>
-<td style="text-align:right;">
-0.1608192
-</td>
-</tr>
-</tbody>
-</table>
-<strong>Moving_tone</strong>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-dynamic_par
-</th>
-<th style="text-align:right;">
-tempo_par
-</th>
-<th style="text-align:right;">
-R2
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-.
-</td>
-<td style="text-align:right;">
--0.1230441
-</td>
-<td style="text-align:right;">
--0.1912192
-</td>
-<td style="text-align:right;">
-0.2345841
+0.1000999
 </td>
 </tr>
 </tbody>
@@ -1739,7 +2007,7 @@ R2
             return(NULL)
         }
     }) %&gt;% purrr::map(purrr::compact) %&gt;% purrr::compact()</code></pre>
-<p>Now that all of the <span class="math inline">\(\chi^2\)</span> Tests have been performed, we can filter for the comparisons that resulted in a statistically significant shift in tone and display them in the tables below.</p>
+<p>Now that all of the <span class="math inline">\(\chi^2\)</span> Tests have been performed, we can filter for the comparisons that resulted in a statistically significant shift in affect and display them in the tables below.</p>
 <pre class="r"><code>purrr::iwalk(all_sig, ~ {
   if (length(.x) &lt; 1) {
     # If no comparisons were made
@@ -3603,13 +3871,14 @@ staccato
 </table>
 <p>χ<sup>2</sup> (N=160) = 22.87, p&lt;.01</p>
 </div>
-<div id="general-associations-between-tone-and-parameter" class="section level3">
-<h3>General associations between tone and parameter</h3>
-<p>Cohen (1992) provides thresholds for determining the magnitude of effect sizes as follows: |d|&lt;0.2 “negligible”, |d|&lt;0.5 “small”, |d|&lt;0.8 “medium”, otherwise “large”. These can be applied to the <span class="math inline">\(\text{Adjusted}\ R^2\)</span> to highlight the most notable associations between tone and parameter: Energetic, Gentle, Playful, Moving.
-The <a href="#tonepar">tables above</a> allow us to draw the following conclusions:
-* the perception of an energetic tone has a small association with increases in the level of tempo and articulation.
-* the perception of a gentle tone has a small association with a decrease in dynamic and an increase in register.
+<div id="general-associations-between-affect-and-parameter" class="section level3">
+<h3>General associations between affect and parameter</h3>
+<p>Cohen (1992) provides thresholds for determining the magnitude of effect sizes as follows: |d|&lt;0.2 “negligible”, |d|&lt;0.5 “small”, |d|&lt;0.8 “medium”, otherwise “large”. These can be applied to the <span class="math inline">\(\text{Adjusted}\ R^2\)</span> to highlight the most notable associations between affect and parameter: Assertive, Energetic, Playful.
+The <a href="#affectpar">tables above</a> allow us to draw the following conclusions:
+* the perception of an energetic affect has a small association with increases in the level of tempo and articulation.
+* the perception of a gentle affect has a small association with a decrease in dynamic and an increase in register.
 * the perception of playfulness has a small association with an increase in articulation and a decrease in register.
 * the perception of being moved has a small association with a decrease in dynamic and a decrease in tempo.</p>
+</div>
 </div>
 </div>

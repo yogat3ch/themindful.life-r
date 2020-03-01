@@ -18,32 +18,65 @@
   }
   h1 {
     font-family: $font-family-heading;
-    line-height: 1.2;
+    line-height: $line-height-base - .2;
+    font-weight: $font-weight-normal;
+    color: #333333;
+    @include media-breakpoint-up(md) {
+      line-height: $line-height-base - .2;
+      font-weight: $font-weight-light;
+    }
+  }
+  h2 {
+    font-family: $font-family-heading;
+    line-height: $line-height-base - .2;
+    font-weight: $font-weight-normal;
+    color: #333333;
+    @include media-breakpoint-up(md) {
+      line-height: $line-height-base - .2;
+    }
+  }
+  // Subheading
+  h3 {
+    color: $primary;
+    line-height: $line-height-base - .4;
     font-weight: $font-weight-light;
+    letter-spacing: 1px;
     color: #333333;
     @include media-breakpoint-up(md) {
       line-height: 1.2;
       font-weight: $font-weight-light;
     }
   }
-  h2 {
-    font-family: $font-family-heading;
-    line-height: 1.4;
-    font-weight: 400;
+  h4 {
+    color: $primary;
+    line-height: $line-height-base - .4;
+    font-weight: $font-weight-light;
+    letter-spacing: 1px;
     color: #333333;
     @include media-breakpoint-up(md) {
-      line-height: 1.4;
+      line-height: $line-height-base - .4;
+      font-weight: $font-weight-light;
     }
   }
-  // Subheading
-  h3 {
+  h5 {
     color: $primary;
-    line-height: 1.4;
+    line-height: $line-height-base - .6;
     font-weight: $font-weight-thin;
     letter-spacing: 1px;
+    color: #333333;
     @include media-breakpoint-up(md) {
-      line-height: 1.4;
-      letter-spacing: 1.8px;
+      line-height: $line-height-base - .6;
+      font-weight: $font-weight-thin;
+    }
+  }
+  h6 {
+    color: $primary;
+    line-height: $line-height-base - .6;
+    font-weight: $font-weight-thin;
+    letter-spacing: 1px;
+    color: #333333;
+    @include media-breakpoint-up(md) {
+      line-height: $line-height-base - .6;
       font-weight: $font-weight-thin;
     }
   }

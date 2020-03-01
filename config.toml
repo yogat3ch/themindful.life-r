@@ -98,7 +98,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
     parent = "Portfolio"
 
 [[menu.main]]
-	  name = "Data Insights (Blog)"
+	  name = "The Dao of Data (Blog)"
 	  url = "/post/"
     weight = 5
 
