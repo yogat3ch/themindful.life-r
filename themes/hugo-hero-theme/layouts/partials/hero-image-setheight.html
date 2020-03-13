@@ -1,6 +1,10 @@
 {{ $scratch := newScratch }}
-{{ if gt (strings.RuneCount .background) 5}} 
-{{ $scratch.Set "bg" .background }}
+{{ if gt (strings.RuneCount .background) 5}}
+  {{ if in .background "http" }} 
+    {{ $scratch.Set "bg" .background }}
+  {{ else }}
+    {{ $scratch.Set "bg" (.background | absURL)}}
+  {{ end }}
 {{ else }}
 {{ $scratch.Set "bg" .content.Site.Params.backgroundDefault }}
 {{ end }}

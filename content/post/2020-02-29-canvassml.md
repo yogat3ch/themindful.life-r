@@ -22,7 +22,7 @@ draft: yes
 # Intro
 All code for this project is hosted at [github.com/yogat3ch/canvassML](http://github.com/yogat3ch/canvassML)
 
-This project has been absorbing most of my attention from January to February 2020 and is the result of about 75 hours of input. The topic, political science, is one that I find particularly engaging, and am easily moved to delve deeper into. I hope that you find the work equally as intriguing and educational! 
+This project has been absorbing most of my attention from January to February 2020 and is the result of about 90 hours of input. The topic, political science, is one that I find particularly engaging, and am easily moved to delve deeper into. I hope that you find the work equally as intriguing and educational! 
 
 If you choose to read the [full analysis](../../../canvassML/), you'll find that the intro below is also found in the full analysis - so if you plan on reading it, go ahead to the main page. If you're just browsing and want to get an idea of what the work is about, please read on.
 
@@ -46,4 +46,5 @@ In this example, Massachusetts zip codes will be used as the target and data fro
 ### Outcome
 New Hampshire 2020 primary election data are used as the response variable in the training data. This is possible because the primary has not yet taken place in Massachusetts, an adjacent state. If voter data is not available, aggregate success rates from existing canvass efforts for an area might also serve as an outcome variable in lieu of voting results. Polling results, if available aggregated by the required geographies, could also serve as the outcome variable. 
 
-If your curiousity is piqued, please [read on](../../../canvassML/index.html#outcome)
+If your curiousity is piqued, please [read on](../../../canvassML/index.html#outcome)... <br>
+**Note:** *The analysis is roughly 58Mb and will take some time to load.*

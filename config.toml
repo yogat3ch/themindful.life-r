@@ -87,7 +87,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.RData$"]
 
 [[menu.main]]
     name = "R (Data Science)" # Drop-down menu entry
-    url = "/post/"
+    url = "/r-experience/"
     weight = 1
     parent = "Portfolio" # Entry in main menu
 

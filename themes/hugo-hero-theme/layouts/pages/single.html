@@ -3,7 +3,15 @@
 {{ define "header_classes" }}{{ end }}
 
 {{ define "main" }}
-
-<h1>{{ .Title }}</h1>
+{{ partial "hero-image-setheight.html" (dict "background" .Params.heroBackground "heading" .Params.heroHeading "subheading" .Params.heroSubHeading "section" .Section "content" . "ctx" $)}}
 {{ .Content }}
+<iframe src="{{ .Params.iframe }}" frameborder="0" width="100%" height="1200px" id="dashboard"></iframe>
+<script src="https://cdn.jsdelivr.net/npm/iframe-resizer@4.2.8/js/iframeResizer.min.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/perfops-rom"></script>
+<script type="text/javascript">
+const iframes = iFrameResize(
+    {log: true},
+    '#dashboard');
+</script>
+
 {{ end }}
