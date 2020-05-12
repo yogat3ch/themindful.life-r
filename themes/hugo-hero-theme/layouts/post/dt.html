@@ -1,0 +1,56 @@
+{{ define "header_css" }}
+{{partial "materialize.html" }}
+{{ end }}
+{{ define "body_classes" }}page-posts-single{{ end }}
+{{ define "header_classes" }}
+{{ end }}
+{{ define "header_dependencies" }}
+{{ partial "datatables.html"}}
+{{ end }}
+{{ define "main" }}
+{{ partial "hero-image-setheight.html" (dict "background" .Params.heroBackground "heading" .Params.heroHeading "subheading" .Params.heroSubHeading "section" .Section "content" .)}}
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-12">
+      {{ $customDateFormat := "02.01.2006" }}
+{{ with .Site.Params.customDateFormat }}{{ $customDateFormat = . }}{{ end }}
+      <h6 class="grey-text">
+        <i class="tiny material-icons">calendar_today</i>&nbsp;{{ .Page.PublishDate.Format $customDateFormat }}{{ if gt .Lastmod .Page.PublishDate }}, {{ i18n "lastupdated" }} {{ .Page.Lastmod.Format $customDateFormat }}{{ end }} -
+        <i class="tiny material-icons">person</i>&nbsp;{{ range .Site.Author }}{{ . }}{{ end }}
+        {{ if ne .Site.Params.hideReadingTime true }}
+            {{ if and (not (.Scratch.Get "showPostSummary")) (.Scratch.Get "fullsize") }}
+                - <i class="tiny material-icons">timer</i>&nbsp;~{{ i18n "readingTime" .Page.ReadingTime }}
+            {{ end }}
+        {{ end }}
+    </h6>
+    <small>
+      {{ if ne .Type "page" }}
+          {{ if gt .Params.categories 0 }}
+              {{ range .Params.categories }}
+                  <a href="{{ "/categories/" | relLangURL }}#{{ . | urlize }}" class="{{ default "orange-text text-lighten-3" ($.Site.Params.themeColor2text) }}">+{{ . }}</a>
+              {{ end }}
+          {{ end }}
+          {{ if gt .Params.tags 0 }}
+              {{ range .Params.tags }}
+                  <a href="{{ "/tags/" | relLangURL }}#{{ . | urlize }}" class="{{ default "orange-text text-lighten-3" ($.Site.Params.themeColor2text) }}">#{{ . }}</a>
+              {{ end }}
+          {{ end }}
+      {{ end }}
+  </small>
+    </div>
+  </div>
+  <hr>
+  <div class="row justify-content-start">
+    <div class="col-12 col-md-12">
+      <div class="posts posts-single">
+        {{ with .Params.featured_image }}
+        <img src="{{ . | urlize }}" alt="featured image" class="featured_image">
+        {{ end }}
+        {{ partial "header_maincodefolding.html" . }}
+        <div class="content">{{.Content}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ end }}
+

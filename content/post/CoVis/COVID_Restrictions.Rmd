@@ -1,0 +1,244 @@
+---
+title: "Lifting Restrictions: A Comparison"
+author: "Stephen Synchronicity"
+date: '2020-05-10'
+heroHeading: "Lifting Restrictions:"
+heroSubHeading: "A Comparison"
+heroBackground: 'images/corona.jpg'
+slug: covid-lifting-restrictions
+type: post
+categories: ["R", "CoVis", "Analysis"]
+tags: ["COVID19", "Coronavirus", "Stay-at-home orders"]
+always_allow_html: yes
+header-includes:
+   - \usepackage{dcolumn}
+output: 
+  html_document: 
+    self_contained: true
+    highlight: pygments
+    orientation: rows
+    keep_md: no
+    theme: yeti
+    df_print: paged
+    code_folding: hide
+---
+```{r setup, include=FALSE}
+# Knitr Options
+knitr::opts_chunk$set(echo = F, message = FALSE, warning = FALSE, cache = TRUE, fig.align = 'center', fig.height = 5, fig.width = 7.5, tidy = TRUE, tidy.opts = list(width.cutoff = 80))
+options(scipen = 12)
+# Make reproducible
+set.seed(1)
+# Load packages
+HDA::startPkgs(c("tidyverse","htmltools","magrittr","printr", "rlang"))
+# # Attach dependencies
+# rmarkdown::html_dependency_jquery()
+# rmarkdown::html_dependency_bootstrap("spacelab")
+# rmarkdown::html_dependency_jqueryui()
+# # Use Chunk Titles to add Bold Headings to Chunks
+# source("~/R/Scripts/addChunkTitles.R")
+# rmd <- addChunkTitles(rstudioapi::getSourceEditorContext()$path)
+# write(rmd,file=(rstudioapi::getSourceEditorContext()$path))
+# # HTML to Latex
+# source("~/R/Scripts/HTMLtoLatex.R")
+# rmd <- HTMLtoLatex(rstudioapi::getSourceEditorContext()$path)
+# write(rmd,file=(rstudioapi::getSourceEditorContext()$path))
+```
+
+
+The following is a look at [COVID-19 Cases & Deaths data](https://github.com/nytimes/covid-19-data) from the New York Times since stay-at-home orders were imposed (or since April 1st if they weren't). The dates and details of stay-at-home orders and their lifting are from the Washington Post article ["Where states are reopening after America’s shutdown"](https://www.washingtonpost.com/graphics/2020/national/states-reopening-coronavirus-map/). 
+[Pettit's Test (a statistical test for changes in trend)](https://link.springer.com/article/10.1007/s40710-015-0105-3)  [`trend::pettit.test`](https://www.rdocumentation.org/packages/trend/versions/1.1.2/topics/pettitt.test) is performed on each set of data to determine where there is a shift in trend (if any). The results of this test are in the captions at the base of each graph and the blue vertical line indicates the date on which the shift in trend occurred according to the test. 
+
+### Graph Legend
+One of the most notable graphs is that of <a href="#minnesota">Minnesota</a>. We'll use it as an example for the descriptions below:
+```{r 'Minnesota Example'}
+states <- readRDS("states.rds")
+.st <- "MN"
+.fns <- purrr::imap(states$Minnesota$g, ~{
+    .fn <- paste0("images/",.st, "_",.y,".png")
+  })
+.imgs <- purrr::map(.fns, ~{
+  .img <- htmltools::tags$img(width = "100%", src = paste0("data:image/png;base64,", RCurl::base64Encode(readBin(.x, "raw", file.info(.x)[1, "size"]), "txt")), style = "margin:auto;")
+})
+shiny::fluidRow(width = 12, shiny::column(6, .imgs[[1]]), shiny::column(6, .imgs[[2]]))
+```
+
+The lower most graph depicts raw cases/deaths:
+
+- The beginning and end of stay-at-home orders are depicted by labeled vertical lines where applicable, with the corresponding dates.
+- Linear regression is performed on the before & after lifting restrictions (or all the data if restrictions were not lifted). The slope of the line is printed near the line as `B: ...`. These can be compared to the linear regression of all the data to illustrate deviation from the overall trajectory.
+
+The middle graph shows daily new cases/deaths:
+
+- A loess regression illustrates whether there was a flux in these numbers after lifting restrictions.
+- A horizontal line is drawn at the mean before & after restrictions lift for states where restrictions are lifted, additionally a Tukey boxplot shows the median and quartiles.
+- The p.value of the T.test comparing the before & after data is plotted near the top. 
+
+The top graph shows the proportion/percent change in daily new cases/deaths. IE the change in the rate of infection:
+
+- A loess regression illustrates whether there was a flux in these numbers after lifting restrictions.
+- A horizontal line is drawn at the mean before & after restrictions lift for states where restrictions are lifted, additionally a Tukey boxplot shows the median and quartiles.
+- The p.value of the T.test comparing the before & after data is plotted near the top. 
+
+### Table of Contents
+#### Legend
+
+ - State = State-name
+ - Is Open? = Logical indicating whether the state has lifted or never imposed restrictions
+ - Date_lifted = The date restrictions were lifted (if they were imposed)
+ - *D_pv = The p-value of the t-test comparing daily new cases/deaths before and after restrictions were lifted,
+ - *D_dm = The difference in means (after - before) of daily new cases/deaths.
+ - *%_pv = The p-value of the t-test comparing the rate of change in daily new cases/deaths before and after restrictions were lifted,
+ - *%_dm= The difference in means (after - before) of the rate of change in daily new cases/deaths before and after restrictions were lifted,
+ - Open = If restrictions were imposed and lifted, what types of establishments and activities are re-opened,
+ - Closed = If restrictions were imposed and lifted, what types of establishments and activities are still restricted.
+
+The table makes it possible to compare the types of restrictions being lifted in states and whether lifting restrictions on those types of establishments is leading to a statistically significant change (the p-value) in the number of cases/deaths, and in what direction the change is occurs (the difference in means).
+
+
+```{r 'Start Selenium', eval = F}
+source("RunDocker.R")
+HDA::startPkgs(c("RSelenium","rvest"))
+startSelenium()
+```
+
+```{r 'R Selenium Chrome Loading', eval = F}
+# For Help: vignette("RSelenium-docker", package = "RSelenium")
+#docker run -d -p 4445:4444 -p 5901:5900 selenium/standalone-chrome-debug
+remDr <- remoteDriver(remoteServerAddr = "192.168.99.100",
+               port = 4445L,
+               browserName = "chrome")
+remDr$open(silent = T)
+remDr$setImplicitWaitTimeout(milliseconds = 4500)
+```
+
+```{r 'Scrape data', eval = F}
+.url <- "https://www.washingtonpost.com/graphics/2020/national/states-reopening-coronavirus-map/"
+.htm <- read_html(.url)
+remDr$navigate(.url)
+reopening <- purrr::map(.sn, ~{
+  message(.x)
+  .id <- paste0("#", stringr::str_replace(tolower(.x), "\\s", "-"))
+  .div <- .htm %>%
+    html_node(.id)
+  # get what's open
+  .open <- .div %>% 
+    html_nodes("li.db.font-xs.pb-sm") %>% 
+    html_text() %>% 
+    stringr::str_extract("(?<=\\:\\s).*") %>% 
+    stringr::str_split(",") %>%
+    purrr::map(~stringr::str_remove(trimws(unlist(stringr::str_split(.x, " and "))), "\\."))
+  # Rsel
+  .div <- remDr$findElement("css selector", .id)
+  remDr$mouseMoveToLocation(webEl = .div)
+  .sh <- tryCatch(.div$findChildElement("css selector", "g.stay-at-home"), error = function(e) NULL)
+  .she <- tryCatch(.div$findChildElement("css selector", "g.stay-at-home-end"), error = function(e) NULL)
+  .dates <- purrr::map(purrr::compact(list(sh = .sh, she = .she)), ~{
+    .state_order <- .x$findChildElement("css selector", "text.order-date")
+  .end <- .state_order$getElementText()[[1]]
+  })
+  list(open = .open, dates = .dates)
+}) 
+```
+```{r 'Save the Scaped Data', eval = F}
+saveRDS(reopening, "reopening.rds")
+```
+```{r 'Load data', eval = F}
+rstudioapi::jobRunScript("states.R", name = "States", exportEnv = "R_GlobalEnv")
+```
+```{r 'test output', fig.dim=c(8,6), eval = F}
+.g <-
+  gridExtra::grid.arrange(
+    gridExtra::arrangeGrob(
+      gridExtra::grid.arrange(gridExtra::arrangeGrob(
+        grobs = out$g$Cases[3:1],
+        nrow = 3,
+        heights = unit(c(2, 2.5, 4), "in")
+      )),
+      gridExtra::grid.arrange(gridExtra::arrangeGrob(
+        grobs = out$g$Deaths[3:1],
+        nrow = 3,
+        heights = unit(c(2, 2.5, 4), "in")
+      )),
+      ncol = 2,
+      widths  = unit(rep(6,2), "in")
+      )
+    )
+ggsave("test.png", plot = .g, device = "png", dpi = 72, units = "in", height = 8.7, width = 12.2)
+```
+
+```{r 'Save renderings', eval = F}
+saveRDS(states, "states.rds")
+```
+```{r 'toc', cache = F}
+`%||%` <- rlang::`%||%`
+ toc <- purrr::imap_dfr(states, ~{
+  .id <- paste0("#", stringr::str_replace(tolower(.y), "\\s", "-"))
+  .is_open <- ifelse(!is.null(.x$dates$e) || is.null(.x$dates$b), T, F)
+  .dc <- as.character(.x$dates$b %||% "No restrictions imposed")
+  .do <- as.character(.x$dates$e %||% "Restrictions not lifted")
+  .open <- .x$open %||% "Restrictions in place"
+  .closed <- .x$closed %||% "Restrictions in place"
+  .dd_c_pval <- .x$change$dd_cases$p.val %||% NA
+  .p_c_pval <- .x$change$p_cases$p.val %||% NA
+  .dd_d_pval <- .x$change$dd_deaths$p.val %||% NA
+  .p_d_pval <- .x$change$p_deaths$p.val %||% NA
+  tibble(State = .y,
+         `Is Open?` = .is_open,
+         Date_lifted = .do,
+         CasesD_pv = HDA::p.txt(.dd_c_pval),
+         CasesD_dm = round(diff(.x$change$dd_cases$t$estimate) %||% NA,3),
+         `Cases%_pv` = HDA::p.txt(.p_c_pval),
+         `Cases%_dm` = round(diff(.x$change$p_cases$t$estimate) %||% NA,3),
+         DeathsD_pv = HDA::p.txt(.dd_d_pval),
+         DeathsD_dm = round(diff(.x$change$dd_deaths$t$estimate) %||% NA,3),
+         `Deaths%_pv` = HDA::p.txt(.p_d_pval),
+         `Deaths%_dm` = round(diff(.x$change$p_deaths$t$estimate) %||% NA,3),
+         Open = paste0(purrr::keep(.open, ~!is.na(.x)), collapse = ", "),
+         Closed = paste0(purrr::keep(.closed, ~!is.na(.x)), collapse = ", ")
+         )
+ })
+ 
+ .dt <- DT::datatable(toc, escape = F, elementId = "table1", options = list(autoWidth = T, paging = F, scrollX = T, scrollY = T, searching = T, responsive = T), fillContainer = T)
+ widgetframe::frameWidget(.dt)
+```
+```{r 'Walk Through and render Graphs', message=T, eval = F}
+.rerender <-  T
+rstudioapi::jobRunScript("render.R", name = "Render", importEnv = T, exportEnv = "R_GlobalEnv")
+```
+```{r 'Render', cache = F}
+.render <- readRDS("render.rds")
+do.call(tagList, .render)
+```
+
+```{r, 'Grob of all states', eval = F}
+
+all_st <- purrr::map(states, ~list(c = .x$Cases$g, d = .x$Deaths$g))
+all_st_g  <- gridExtra::arrangeGrob(grobs = unlist(all_st, recursive = F), nrow = 6, widths = unit(c(4,4), "in"), heights = unit(rep(4,6), "in"), uni)
+ggsave("all_st.png", plot = gridExtra::grid.arrange(all_st_g), path = "~/R/COVID/", height = 24, width = 8, units = "in") 
+
+```
+
+
+<!-- <button data-toggle="collapse" data-target="#demo" style="width:150px;height:100px" class="btn">Loading RSelenium</button> -->
+<!-- <div id="demo" class="collapse"> -->
+<!-- To begin: -->
+<!-- <ul> -->
+<!-- <li>On Windows Home 10, use Ctrl-Alt-Del to open Task manager, Performance>CPU, see if Virtualization is enabled.</li> -->
+<!-- <li>If not, enable Hardware Virtualization for your system in the BIOS. (Google search: "<model name> enable Hardware Virtualization")</li> -->
+<!-- <li>Download the Docker Toolbox as per the <a href="https://docs.docker.com/toolbox/toolbox_install_windows/" target="_blank">instructions here.</a></li> -->
+<!-- <li>Allow the Docker to also install Oracle VM</li> -->
+<!-- <li>Follow all steps in the instructions down to verifying the installation with Hello world command.</li> -->
+<!-- <li>Run Docker Quickstart Terminal</li> -->
+<!-- <li>Accept all installation prompts</li> -->
+<!-- <li><a href="https://hub.docker.com/r/selenium/standalone-chrome/" target="_blank">Pull a Standalone Chrome Debug node</a></li> -->
+<!-- <li>Run a Standalone Chrome node <code>docker run -d -P selenium/standalone-chrome</code></li> -->
+<!-- <li>Use `docker-machine ip` to establish IP Address, make that value the `remoteServeraddr`</li> -->
+<!-- <li>Use `docker ps` to get name of running Chrome node</li> -->
+<!-- <li>Use `docker port` with the name provided in the output of docker ps</li> -->
+<!-- <li>Set the port in the function below</li> -->
+<!-- <li>When complete use the following to stop all containers in docker "docker stop `$(docker ps -aq)`" -->
+<!-- Launch TightVNC: `"C:\Program Files\TightVNC\tvnviewer.exe"` -->
+<!-- stop all containers: `docker stop $(docker ps -aq)` -->
+<!-- remove all containers: `docker rm $(docker ps -aq)` -->
+<!-- remove all images: `docker rmi $(docker images -q)` -->
+<!-- </div> -->

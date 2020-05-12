@@ -1,0 +1,11 @@
+library(tidyverse)
+reopening <- readRDS("reopening.rds")
+source("Covid_Restrictions_Pettit.R", local = environment())
+us <- readr::read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv")
+`%|%` <- Vectorize(FUN = function(rhs, lhs){rlang::`%|%`(rhs, lhs);ifelse(is.nan(rhs), lhs, rhs)})
+future::plan(future::multiprocess, workers = 4)
+states <- furrr::future_imap(reopening, ~{
+  state <- rlang::list2(!!.y := .x)
+  .res <- pettit.state(state, covid_data = us)
+})
+saveRDS(states,"states.rds")
